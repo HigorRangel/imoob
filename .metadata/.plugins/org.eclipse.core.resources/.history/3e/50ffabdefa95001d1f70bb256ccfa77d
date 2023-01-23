@@ -1,0 +1,85 @@
+package com.imoob.hml.config;
+
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+import com.imoob.hml.service.exceptions.CustomAccessDeniedHandler;
+import com.imoob.hml.service.exceptions.CustomAuthenticationFailureHandler;
+import com.imoob.hml.service.exceptions.CustomLogoutSuccessHandler;
+
+import lombok.RequiredArgsConstructor;
+
+@Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
+@EnableMethodSecurity
+public class SecurityConfiguration {
+	
+	private final  AuthenticationProvider authenticationProvider;
+	private final JwtAuthFilter jwtAuthFilter;
+
+	@Bean
+	public SecurityFilterChain setFilterChain(HttpSecurity http) throws Exception {
+//		http
+//			.csrf()
+//			.disable()
+//			.authorizeHttpRequests()
+//			.requestMatchers("/api/auth/**").permitAll()
+//			.requestMatchers("/").permitAll()
+//			.requestMatchers("/h2-console/**").permitAll()
+////			.requestMatchers("/users").hasAuthority(Role.USER.name())
+//			.anyRequest().authenticated()
+//			.and().headers().frameOptions().sameOrigin()
+//			.and()
+//			.sessionManagement()
+//			.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//			.and()
+//			.authenticationProvider(authenticationProvider)
+//			.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+//			.exceptionHandling().accessDeniedHandler(accessDeniedHandler());
+//		
+		http
+        .authorizeHttpRequests(auth -> auth
+                .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
+        )
+        .headers(headers -> headers.frameOptions().disable())
+        .csrf(csrf -> csrf
+                .ignoringRequestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")));
+//        .sessionManagement();
+//		.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+//		.and()
+//		.authenticationProvider(authenticationProvider)
+//		.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+//		.exceptionHandling().accessDeniedHandler(accessDeniedHandler());
+
+		return http.build();
+	}
+
+	 @Bean
+	    public LogoutSuccessHandler logoutSuccessHandler() {
+	        return new CustomLogoutSuccessHandler();
+	    }
+
+	    @Bean
+	    public AccessDeniedHandler accessDeniedHandler() {
+	        return new CustomAccessDeniedHandler();
+	    }
+
+	    @Bean
+	    public AuthenticationFailureHandler authenticationFailureHandler() {
+	        return new CustomAuthenticationFailureHandler();
+	    }
+
+}

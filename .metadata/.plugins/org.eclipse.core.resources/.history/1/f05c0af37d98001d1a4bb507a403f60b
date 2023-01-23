@@ -1,0 +1,5 @@
+package com.imoob.hml.model.pk;
+
+public class UserRolePk {
+
+}

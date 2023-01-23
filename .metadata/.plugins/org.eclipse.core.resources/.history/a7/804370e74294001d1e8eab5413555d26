@@ -1,0 +1,118 @@
+package com.imoob.hml.model;
+
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.Collection;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+
+@Entity
+@Table(name="tb_user")
+@NoArgsConstructor
+@AllArgsConstructor
+@RequiredArgsConstructor
+@Getter
+@Setter
+@Builder
+public class User implements Serializable, UserDetails{
+	
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	
+	@NonNull
+	@Column(length = 25)
+	private String firstName;
+	
+	@Column(length = 25)
+	private String middleNames;
+	
+	@NonNull
+	@Column(length = 25)
+	private String lastName;
+	
+	@NonNull
+	@Column(length = 50)
+	private String email;
+	
+//	@Enumerated(EnumType.ORDINAL)
+//	@NonNull
+//	private UserStatus status;
+	
+	@NonNull
+	@Column(length = 11)
+	private String cpf;
+	
+	@Column(length = 8)
+	private String cepAddress;
+	
+	@Column(length = 12)
+	private String numberAddress;
+	
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	private Instant birthDate;
+
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
+	private Instant created;
+	
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getPassword() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getUsername() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+}

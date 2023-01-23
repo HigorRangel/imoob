@@ -1,0 +1,25 @@
+package com.imoob.hml.service;
+
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
+
+import com.imoob.hml.model.User;
+
+import lombok.RequiredArgsConstructor;
+
+@Service	
+@RequiredArgsConstructor
+public class PermissionService {
+	
+	public boolean validatePermission(String requestURI, UserDetails userDetails) {
+		if(userDetails instanceof User) {
+			User user = (User)userDetails;
+			
+			
+			
+		}
+
+		return false;
+	}
+
+}

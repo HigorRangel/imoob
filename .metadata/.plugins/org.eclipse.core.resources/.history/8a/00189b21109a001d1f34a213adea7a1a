@@ -1,0 +1,5 @@
+package com.imoob.hml.controller.config;
+
+public class ConfigInterceptor {
+
+}

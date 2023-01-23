@@ -1,0 +1,5 @@
+package com.imoob.hml.service.exceptions;
+
+public class GeneralException {
+
+}

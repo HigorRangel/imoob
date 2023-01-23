@@ -1,0 +1,97 @@
+package com.imoob.hml.service;
+
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
+
+import com.imoob.hml.model.Permission;
+import com.imoob.hml.model.Role;
+import com.imoob.hml.model.User;
+import com.imoob.hml.repository.PermissionRepository;
+import com.imoob.hml.service.exceptions.DatabaseException;
+import com.imoob.hml.service.exceptions.GeneralException;
+import com.imoob.hml.service.exceptions.ResourceNotFoundException;
+import com.imoob.hml.service.utils.StringUtils;
+
+import lombok.RequiredArgsConstructor;
+
+@Service	
+@RequiredArgsConstructor
+public class PermissionService {
+	
+	private final PermissionRepository repository;
+	
+	
+	public List<Permission> findAll(Pageable pageable) {
+		return repository.findAll(pageable);
+	}
+	
+	
+	public Permission findById(Long id) {
+		Optional<Permission> optPermission = repository.findById(id);
+		return optPermission.orElseThrow(() -> new ResourceNotFoundException(id, Permission.class));
+	}
+	
+	
+	public Permission insert(Permission permission) {
+		return repository.save(permission);
+	}
+	
+	public void delete(Long id) {
+		try {
+			repository.deleteById(id);
+		} catch (EmptyResultDataAccessException e) {
+			throw new ResourceNotFoundException(id, Permission.class);
+		} catch (DataIntegrityViolationException e) {
+			throw new DatabaseException(e.getMessage());
+		}
+	}
+	
+	
+	public Permission update(Long id, Permission obj) {
+		try {
+			Permission entity = repository.findById(id).get();
+			updateData(entity, obj);
+			return repository.save(entity);
+		} catch (NoSuchElementException e) {
+			throw new ResourceNotFoundException(id, Permission.class);
+		}
+	}
+	
+	private void updateData(Permission entity, Permission obj) {
+		validateRoleName(obj.getName());
+		entity.setName(obj.getName());
+		entity.setDisplayName(obj.getDisplayName());
+		entity.setDescription(obj.getDescription());
+	}
+
+	public
+
+	public boolean validatePermission(String requestURI, UserDetails userDetails) {
+		if(userDetails instanceof User) {
+			User user = (User)userDetails;
+		}
+
+		return false;
+	}
+	
+	/**
+	 * Validates if role name contains space or Diacritical Marks
+	 * @param value
+	 */
+	private void validateRoleName(String value) {
+		if(value.contains(" ")) {
+			throw new GeneralException("Não é permitido espaços no campo [Nome da Permissão]. User \"_\" para separar nomes. Ex: \"NOME_DA_PERMISSAO\".");
+		}
+		if(StringUtils.containsDiacriticalMarks(value)) {
+			throw new GeneralException("Não é permitido acentuações no campo [Nome da Permissão]. Remova-as e tente novamente.");
+		}
+	}
+
+}

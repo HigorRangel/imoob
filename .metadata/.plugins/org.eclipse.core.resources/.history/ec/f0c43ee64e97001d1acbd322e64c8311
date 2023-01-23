@@ -1,0 +1,159 @@
+package com.imoob.hml.model;
+
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.Collection;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.imoob.hml.model.enums.UserStatus;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+
+@Entity
+@Table(name="tb_user")
+@NoArgsConstructor
+@AllArgsConstructor
+@RequiredArgsConstructor
+@EqualsAndHashCode
+
+@Builder
+public class User implements Serializable, UserDetails{
+	
+	private static final long serialVersionUID = 1L;
+	@Id
+	@Getter @Setter
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	
+	@NonNull
+	@Getter @Setter
+	@Column(length = 25)
+	private String firstName;
+	
+	@Column(length = 25)
+	@Getter @Setter
+	private String middleNames;
+	
+	@NonNull
+	@Getter @Setter
+	@Column(length = 25)
+	private String lastName;
+	
+	@NonNull
+	@Getter @Setter
+	@Column(length = 50)
+	private String email;
+	
+//	@Getter @Setter
+//	@Enumerated(EnumType.STRING)
+//	@NonNull
+//	private UserStatus status;
+	
+	@NonNull
+	private Character status;
+	
+//	private Character status;
+	
+	@NonNull
+	@Getter @Setter
+	@Column(length = 11)
+	private String cpf;
+	
+	@Getter @Setter
+	@Column(length = 8)
+	private String cepAddress;
+	
+	@Getter @Setter
+	@Column(length = 12)
+	private String numberAddress;
+	
+	@Getter @Setter
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	private Instant birthDate;
+ 
+	@Getter @Setter
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
+	private Instant created;
+	
+	@Getter @Setter
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
+	private Instant inactived;
+	
+	@Getter @Setter
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
+	private Instant lastUpdate;
+	
+	@NonNull
+	@Setter
+	private String password;
+	
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getPassword() {
+		return password;
+	}
+
+	@Override
+	public String getUsername() {
+		return email;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return !(UserStatus.valueOf(status) == UserStatus.EXPIRED);
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return !(UserStatus.valueOf(status) == UserStatus.BLOCKED);
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return !(UserStatus.valueOf(status) == UserStatus.ACTIVE);
+	}
+
+	public UserStatus getStatus() {
+		return UserStatus.valueOf(status);
+	}
+
+	public void setStatus(UserStatus status) {
+		this.status = status.getStatusKey();
+	}
+	
+	public static class UserBuilder {
+		Character status;
+		
+		public UserBuilder status(UserStatus status) {
+			this.status = status.getStatusKey();
+			return this;
+		}
+	}
+
+}
