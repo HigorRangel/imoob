@@ -1,9 +1,0 @@
-package com.imoob.hml.service.utils;
-
-import org.springframework.stereotype.Component;
-
-@Component
-public class BeanUtil extends org.springframework.beans.BeanUtils{
-
-	
-}

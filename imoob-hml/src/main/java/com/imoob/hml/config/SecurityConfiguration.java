@@ -54,8 +54,8 @@ public class SecurityConfiguration {
 		http
         .authorizeHttpRequests(auth -> auth
                 .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/users/**").permitAll()
+//                .requestMatchers("/api/auth/**").permitAll()
+//                .requestMatchers("/api/users/**").permitAll()
                 .anyRequest().authenticated()
         ) 
         .headers(headers -> headers.frameOptions().disable())
@@ -68,24 +68,13 @@ public class SecurityConfiguration {
 		.authenticationProvider(authenticationProvider)
 		.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
 		.exceptionHandling()
-		.accessDeniedHandler(accessDeniedHandler())
-		.authenticationEntryPoint(authenticationEntryPoint())
-		.defaultAccessDeniedHandlerFor(defaultAccessDeniedHandlerFor(), new AntPathRequestMatcher("/api/**"));
+		.accessDeniedHandler(accessDeniedHandler());
+		
 
 		return http.build();
 	}
 
-	@Bean
-	public AccessDeniedHandler defaultAccessDeniedHandlerFor() {
-		System.out.println("Teste");
-		return null;
-	}
 
-	@Bean
-	public AuthenticationEntryPoint authenticationEntryPoint() {
-		System.out.println("Teste");
-		return null;
-	}
 
 	@Bean
     public LogoutSuccessHandler logoutSuccessHandler() {

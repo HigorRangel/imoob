@@ -9,6 +9,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.imoob.hml.model.Permission;
 import com.imoob.hml.model.Role;
 import com.imoob.hml.repository.RoleRepository;
 import com.imoob.hml.service.exceptions.DatabaseException;
@@ -34,6 +35,9 @@ public class RoleService {
 	}
 
 	public Role insert(Role role) {
+		validateEmptyRoleFields(role);
+		validateRoleName(role.getName());
+		validateDuplicateRoles(role);
 		return roleRepository.save(role);
 	}
 	
@@ -49,6 +53,9 @@ public class RoleService {
 	}
 	
 	public Role update(Long id, Role obj) {
+		validateEmptyRoleFields(obj);
+		validateRoleName(obj.getName());
+		
 		try {
 			Role entity = roleRepository.findById(id).get();
 			updateData(entity, obj);
@@ -95,6 +102,33 @@ public class RoleService {
 		}
 		if(StringUtils.containsDiacriticalMarks(value)) {
 			throw new GeneralException("Não é permitido acentuações no campo [Nome da Role]. Remova-as e tente novamente.");
+		}
+	}
+	
+	
+	/**
+	 * Validates if the fields are empty
+	 * @param permission
+	 */
+	private void validateEmptyRoleFields(Role role) {
+		if(StringUtils.isNullOrEmpty(role.getName().trim())) {
+			throw new GeneralException("Campo Nome não preenchido.");
+		}
+		if(StringUtils.isNullOrEmpty(role.getDisplayName().trim())) {
+			throw new GeneralException("Campo Nome de Exibição não preenchido.");
+		}
+	}
+	
+	/**
+	 * Validates if there are already records with the same data
+	 * @param permission
+	 */
+	private void validateDuplicateRoles(Role role) {
+		if(roleRepository.findByName(role.getName().trim().toUpperCase()) != null) {
+			throw new DatabaseException("Já existe um registro com o nome '" + role.getName().toUpperCase() + "'");
+		}
+		if(roleRepository.findByDisplayName(role.getDisplayName().trim()) != null) {
+			throw new DatabaseException("Já existe um registro com o nome de exibição '" + role.getDisplayName() + "'");
 		}
 	}
 }

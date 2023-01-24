@@ -20,24 +20,21 @@ import com.imoob.hml.service.utils.StringUtils;
 
 import lombok.RequiredArgsConstructor;
 
-@Service	
+@Service
 @RequiredArgsConstructor
 public class PermissionService {
-	
+
 	private final PermissionRepository repository;
-	
-	
+
 	public List<Permission> findAll(Pageable pageable) {
 		return repository.findAll(pageable);
 	}
-	
-	
+
 	public Permission findById(Long id) {
 		Optional<Permission> optPermission = repository.findById(id);
 		return optPermission.orElseThrow(() -> new ResourceNotFoundException(id, Permission.class));
 	}
-	
-	
+
 	public Permission insert(Permission permission) {
 		validateEmptyPermissionFields(permission);
 		validatePermissionName(permission.getName());
@@ -45,7 +42,7 @@ public class PermissionService {
 		permission.setName(permission.getName().toUpperCase());
 		return repository.save(permission);
 	}
-	
+
 	public void delete(Long id) {
 		try {
 			repository.deleteById(id);
@@ -55,21 +52,21 @@ public class PermissionService {
 			throw new DatabaseException(e.getMessage());
 		}
 	}
-	
-	
+
 	public Permission update(Long id, Permission obj) {
 		validateEmptyPermissionFields(obj);
 		validatePermissionName(obj.getName());
 
 		try {
 			Permission entity = repository.findById(id).get();
+			validateDuplicatePermissionsUpdate(obj, entity);
 			updateData(entity, obj);
 			return repository.save(entity);
 		} catch (NoSuchElementException e) {
 			throw new ResourceNotFoundException(id, Permission.class);
 		}
 	}
-	
+
 	private void updateData(Permission entity, Permission obj) {
 		entity.setName(obj.getName().trim().toUpperCase());
 		entity.setDisplayName(obj.getDisplayName());
@@ -79,19 +76,18 @@ public class PermissionService {
 	public Permission patchUpdate(Long id, Permission obj) {
 		try {
 			Permission entity = repository.findById(id).get();
-			
-			
-			if(!StringUtils.isNullOrEmpty(obj.getName())) {
+
+			if (!StringUtils.isNullOrEmpty(obj.getName())) {
 				validatePermissionName(obj.getName().trim());
 				entity.setName(obj.getName().trim().toUpperCase());
 			}
-			if(!StringUtils.isNullOrEmpty(obj.getDisplayName())) {
+			if (!StringUtils.isNullOrEmpty(obj.getDisplayName())) {
 				entity.setDisplayName(obj.getDisplayName().trim());
 			}
-			if(!StringUtils.isNullOrEmpty(obj.getDescription())) {
+			if (!StringUtils.isNullOrEmpty(obj.getDescription())) {
 				entity.setDisplayName(obj.getDescription().trim());
 			}
-			
+
 			return repository.save(entity);
 		} catch (NoSuchElementException e) {
 			throw new ResourceNotFoundException(id, Permission.class);
@@ -99,49 +95,76 @@ public class PermissionService {
 	}
 
 	public boolean validatePermission(String requestURI, UserDetails userDetails) {
-		if(userDetails instanceof User) {
-			User user = (User)userDetails;
+		if (userDetails instanceof User) {
+			User user = (User) userDetails;
 		}
 
 		return false;
 	}
-	
+
 	/**
 	 * Validates if role name contains space or Diacritical Marks
+	 * 
 	 * @param value
 	 */
 	private void validatePermissionName(String value) {
-		if(value.contains(" ")) {
-			throw new GeneralException("Não é permitido espaços no campo [Nome da Permissão]. User \"_\" para separar nomes. Ex: \"NOME_DA_PERMISSAO\".");
+		if (value.contains(" ")) {
+			throw new GeneralException(
+					"Não é permitido espaços no campo [Nome da Permissão]. User \"_\" para separar nomes. Ex: \"NOME_DA_PERMISSAO\".");
 		}
-		if(StringUtils.containsDiacriticalMarks(value)) {
-			throw new GeneralException("Não é permitido acentuações no campo [Nome da Permissão]. Remova-as e tente novamente.");
+		if (StringUtils.containsDiacriticalMarks(value)) {
+			throw new GeneralException(
+					"Não é permitido acentuações no campo [Nome da Permissão]. Remova-as e tente novamente.");
 		}
 	}
-	
+
 	/**
 	 * Validates if the fields are empty
+	 * 
 	 * @param permission
 	 */
 	private void validateEmptyPermissionFields(Permission permission) {
-		if(StringUtils.isNullOrEmpty(permission.getName().trim())) {
+		if (StringUtils.isNullOrEmpty(permission.getName().trim())) {
 			throw new GeneralException("Campo Nome não preenchido.");
 		}
-		if(StringUtils.isNullOrEmpty(permission.getDisplayName().trim())) {
+		if (StringUtils.isNullOrEmpty(permission.getDisplayName().trim())) {
 			throw new GeneralException("Campo Nome de Exibição não preenchido.");
 		}
 	}
-	
+
 	/**
 	 * Validates if there are already records with the same data
+	 * 
 	 * @param permission
 	 */
 	private void validateDuplicatePermissions(Permission permission) {
-		if(repository.findByName(permission.getName().trim().toUpperCase()) != null) {
-			throw new DatabaseException("Já existe um registro com o nome '" + permission.getName().toUpperCase() + "'");
+		if (repository.findByName(permission.getName().trim().toUpperCase()) != null) {
+			throw new DatabaseException(
+					"Já existe um registro com o nome '" + permission.getName().toUpperCase() + "'");
 		}
-		if(repository.findByDisplayName(permission.getDisplayName().trim()) != null) {
-			throw new DatabaseException("Já existe um registro com o nome de exibição '" + permission.getDisplayName() + "'");
+		if (repository.findByDisplayName(permission.getDisplayName().trim()) != null) {
+			throw new DatabaseException(
+					"Já existe um registro com o nome de exibição '" + permission.getDisplayName() + "'");
+		}
+	}
+
+	/**
+	 * Validates if there are already records with the same data
+	 * 
+	 * @param permissionUpdate
+	 * @param oldPermission
+	 */
+	private void validateDuplicatePermissionsUpdate(Permission newPermission, Permission oldPermission) {
+		Permission permissionByName = repository.findByName(newPermission.getName().trim().toUpperCase());
+		Permission permissionByDisplayName = repository.findByDisplayName(newPermission.getDisplayName().trim());
+
+		if (permissionByName != null && !permissionByName.getId().equals(oldPermission.getId())) {
+			throw new DatabaseException(
+					"Já existe um registro com o nome '" + newPermission.getName().toUpperCase() + "'");
+		}
+		if (permissionByDisplayName != null && !permissionByDisplayName.getId().equals(oldPermission.getId())) {
+			throw new DatabaseException(
+					"Já existe um registro com o nome de exibição '" + newPermission.getDisplayName() + "'");
 		}
 	}
 
