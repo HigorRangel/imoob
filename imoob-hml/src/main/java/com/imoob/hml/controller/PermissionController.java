@@ -17,7 +17,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.imoob.hml.model.Permission;
 import com.imoob.hml.service.PermissionService;
-import com.imoob.hml.service.RoleService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,7 +27,7 @@ public class PermissionController {
 	
 	private final PermissionService service;
 	
-	@GetMapping
+	@GetMapping("/")
 	public ResponseEntity<List<Permission>> findAll(Pageable pageable){
 		List<Permission> list = service.findAll(pageable);
 		return ResponseEntity.ok().body(list);
@@ -40,7 +39,7 @@ public class PermissionController {
 		return ResponseEntity.ok().body(permission);
 	}
 	
-	@PostMapping
+	@PostMapping("/")
 	public ResponseEntity<Permission> insert(@RequestBody Permission permission){
 		permission = service.insert(permission);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")

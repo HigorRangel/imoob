@@ -1,0 +1,15 @@
+package com.imoob.hml.service.exceptions;
+
+public class GeneralException extends RuntimeException{
+
+	private static final long serialVersionUID = 1L;
+	
+	public GeneralException(String message) {
+		super(message);
+	}
+	
+	public GeneralException(String message, Class<?> class) {
+		super(message);
+	}
+
+}

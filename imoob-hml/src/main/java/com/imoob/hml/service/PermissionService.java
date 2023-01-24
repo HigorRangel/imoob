@@ -11,7 +11,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.imoob.hml.model.Permission;
-import com.imoob.hml.model.Role;
 import com.imoob.hml.model.User;
 import com.imoob.hml.repository.PermissionRepository;
 import com.imoob.hml.service.exceptions.DatabaseException;
@@ -40,6 +39,10 @@ public class PermissionService {
 	
 	
 	public Permission insert(Permission permission) {
+		validateEmptyPermissionFields(permission);
+		validatePermissionName(permission.getName());
+		validateDuplicatePermissions(permission);
+		permission.setName(permission.getName().toUpperCase());
 		return repository.save(permission);
 	}
 	
@@ -55,6 +58,9 @@ public class PermissionService {
 	
 	
 	public Permission update(Long id, Permission obj) {
+		validateEmptyPermissionFields(obj);
+		validatePermissionName(obj.getName());
+
 		try {
 			Permission entity = repository.findById(id).get();
 			updateData(entity, obj);
@@ -65,8 +71,7 @@ public class PermissionService {
 	}
 	
 	private void updateData(Permission entity, Permission obj) {
-		validateRoleName(obj.getName());
-		entity.setName(obj.getName());
+		entity.setName(obj.getName().trim().toUpperCase());
 		entity.setDisplayName(obj.getDisplayName());
 		entity.setDescription(obj.getDescription());
 	}
@@ -77,8 +82,8 @@ public class PermissionService {
 			
 			
 			if(!StringUtils.isNullOrEmpty(obj.getName())) {
-				validateRoleName(obj.getName().trim());
-				entity.setName(obj.getName().trim());
+				validatePermissionName(obj.getName().trim());
+				entity.setName(obj.getName().trim().toUpperCase());
 			}
 			if(!StringUtils.isNullOrEmpty(obj.getDisplayName())) {
 				entity.setDisplayName(obj.getDisplayName().trim());
@@ -105,12 +110,38 @@ public class PermissionService {
 	 * Validates if role name contains space or Diacritical Marks
 	 * @param value
 	 */
-	private void validateRoleName(String value) {
+	private void validatePermissionName(String value) {
 		if(value.contains(" ")) {
 			throw new GeneralException("Não é permitido espaços no campo [Nome da Permissão]. User \"_\" para separar nomes. Ex: \"NOME_DA_PERMISSAO\".");
 		}
 		if(StringUtils.containsDiacriticalMarks(value)) {
 			throw new GeneralException("Não é permitido acentuações no campo [Nome da Permissão]. Remova-as e tente novamente.");
+		}
+	}
+	
+	/**
+	 * Validates if the fields are empty
+	 * @param permission
+	 */
+	private void validateEmptyPermissionFields(Permission permission) {
+		if(StringUtils.isNullOrEmpty(permission.getName().trim())) {
+			throw new GeneralException("Campo Nome não preenchido.");
+		}
+		if(StringUtils.isNullOrEmpty(permission.getDisplayName().trim())) {
+			throw new GeneralException("Campo Nome de Exibição não preenchido.");
+		}
+	}
+	
+	/**
+	 * Validates if there are already records with the same data
+	 * @param permission
+	 */
+	private void validateDuplicatePermissions(Permission permission) {
+		if(repository.findByName(permission.getName().trim().toUpperCase()) != null) {
+			throw new DatabaseException("Já existe um registro com o nome '" + permission.getName().toUpperCase() + "'");
+		}
+		if(repository.findByDisplayName(permission.getDisplayName().trim()) != null) {
+			throw new DatabaseException("Já existe um registro com o nome de exibição '" + permission.getDisplayName() + "'");
 		}
 	}
 

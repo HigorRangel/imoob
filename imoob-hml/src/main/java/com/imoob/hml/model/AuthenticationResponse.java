@@ -10,28 +10,28 @@ public class AuthenticationResponse implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	private String token;
+	private String accessToken;
 	
 	public AuthenticationResponse() {
 		
 	}
 
-	public AuthenticationResponse(String token) {
+	public AuthenticationResponse(String accessToken) {
 		super();
-		this.token = token;
+		this.accessToken = accessToken;
 	}
 
 	public String getToken() {
-		return token;
+		return accessToken;
 	}
 
-	public void setToken(String token) {
-		this.token = token;
+	public void setToken(String accessToken) {
+		this.accessToken = accessToken;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(token);
+		return Objects.hash(accessToken);
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class AuthenticationResponse implements Serializable{
 		if (getClass() != obj.getClass())
 			return false;
 		AuthenticationResponse other = (AuthenticationResponse) obj;
-		return Objects.equals(token, other.token);
+		return Objects.equals(accessToken, other.accessToken);
 	}
 	
 	
