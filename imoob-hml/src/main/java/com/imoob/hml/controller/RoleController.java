@@ -27,7 +27,7 @@ public class RoleController {
 	
 	private final RoleService service;
 	
-	@GetMapping
+	@GetMapping("/")
 	public ResponseEntity<List<Role>> findAll(Pageable pageable){
 		List<Role> list = service.findAll(pageable);
 		return ResponseEntity.ok().body(list);
@@ -39,7 +39,7 @@ public class RoleController {
 		return ResponseEntity.ok().body(role);
 	}
 	
-	@PostMapping
+	@PostMapping("/")
 	public ResponseEntity<Role> insert(@RequestBody Role role){
 		role = service.insert(role);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")

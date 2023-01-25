@@ -38,6 +38,7 @@ public class RoleService {
 		validateEmptyRoleFields(role);
 		validateRoleName(role.getName());
 		validateDuplicateRoles(role);
+		role.setName(role.getName().toUpperCase());
 		return roleRepository.save(role);
 	}
 	
@@ -58,7 +59,10 @@ public class RoleService {
 		
 		try {
 			Role entity = roleRepository.findById(id).get();
+			validateDuplicateRolesUpdate(obj, entity);
+			
 			updateData(entity, obj);
+
 			return roleRepository.save(entity);
 		} catch (NoSuchElementException e) {
 			throw new ResourceNotFoundException(id, Role.class);
@@ -67,7 +71,7 @@ public class RoleService {
 
 	private void updateData(Role entity, Role obj) {
 		entity.setDescription(obj.getDescription());
-		entity.setName(obj.getName());
+		entity.setName(obj.getName().toUpperCase());
 		entity.setDisplayName(obj.getDisplayName());
 	}
 	
@@ -76,10 +80,12 @@ public class RoleService {
 			Role entity = roleRepository.findById(id).get();
 
 			if(!StringUtils.isNullOrEmpty(obj.getName())) {
-				validateRoleName(obj.getName().trim());
-				entity.setName(obj.getName().trim());
+				validateRoleName(obj.getName().toUpperCase().trim());
+				validateDuplicateRolesUpdate(obj, entity);
+				entity.setName(obj.getName().toUpperCase().trim());
 			}
 			if(!StringUtils.isNullOrEmpty(obj.getDescription())) {
+				validateDuplicateRolesUpdate(obj, entity);
 				entity.setDescription(obj.getDescription().trim());
 			}
 			if(!StringUtils.isNullOrEmpty(obj.getDisplayName())) {
@@ -129,6 +135,27 @@ public class RoleService {
 		}
 		if(roleRepository.findByDisplayName(role.getDisplayName().trim()) != null) {
 			throw new DatabaseException("Já existe um registro com o nome de exibição '" + role.getDisplayName() + "'");
+		}
+	}
+	
+	
+	/**
+	 * Validates if there are already records with the same data
+	 * 
+	 * @param permissionUpdate
+	 * @param oldPermission
+	 */
+	private void validateDuplicateRolesUpdate(Role newRole, Role oldRole) {
+		Role roleByName = roleRepository.findByName(newRole.getName().trim().toUpperCase());
+		Role roleByDisplayName = roleRepository.findByDisplayName(newRole.getDisplayName().trim());
+
+		if (roleByName != null && !roleByName.getId().equals(oldRole.getId())) {
+			throw new DatabaseException(
+					"Já existe um registro com o nome '" + newRole.getName().toUpperCase() + "'");
+		}
+		if (roleByDisplayName != null && !roleByDisplayName.getId().equals(oldRole.getId())) {
+			throw new DatabaseException(
+					"Já existe um registro com o nome de exibição '" + newRole.getDisplayName() + "'");
 		}
 	}
 }

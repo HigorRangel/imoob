@@ -54,8 +54,8 @@ public class SecurityConfiguration {
 		http
         .authorizeHttpRequests(auth -> auth
                 .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
-//                .requestMatchers("/api/auth/**").permitAll()
-//                .requestMatchers("/api/users/**").permitAll()
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/users/**").permitAll()
                 .anyRequest().authenticated()
         ) 
         .headers(headers -> headers.frameOptions().disable())
