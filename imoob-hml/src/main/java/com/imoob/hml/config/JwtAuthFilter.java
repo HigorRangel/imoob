@@ -8,10 +8,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.imoob.hml.model.exceptions.StandardError;
 import com.imoob.hml.service.AuthenticationService;
 import com.imoob.hml.service.PermissionService;
@@ -70,20 +72,35 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 			}
 			filterChain.doFilter(request, response);
 		} catch (ExpiredJwtException e) {
-			response.setStatus(HttpStatus.BAD_REQUEST.value());
-			String error = "JWT Expired.";
+			errorExpiredJwt(request, response, e);
+			
+		}
+		catch (UsernameNotFoundException e) {
+			response.setStatus(HttpStatus.FORBIDDEN.value());
+			String error = "JWT inválido. Usuário não encontrado.";
 
-			StandardError err = new StandardError(Instant.now(), HttpStatus.BAD_REQUEST.value(), error, e.getMessage(),
+			StandardError err = new StandardError(Instant.now(), HttpStatus.FORBIDDEN.value(), error, e.getMessage(),
 					request.getRequestURI());
 
 			response.setContentType("application/json");
 			response.getWriter().write(generalUtils.convertObjectToJson(err));
-			
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
 
+	}
+
+	private void errorExpiredJwt(HttpServletRequest request, HttpServletResponse response, ExpiredJwtException e)
+			throws IOException, JsonProcessingException {
+		response.setStatus(HttpStatus.BAD_REQUEST.value());
+		String error = "JWT Expired.";
+
+		StandardError err = new StandardError(Instant.now(), HttpStatus.BAD_REQUEST.value(), error, e.getMessage(),
+				request.getRequestURI());
+
+		response.setContentType("application/json");
+		response.getWriter().write(generalUtils.convertObjectToJson(err));
 	}
 
 	

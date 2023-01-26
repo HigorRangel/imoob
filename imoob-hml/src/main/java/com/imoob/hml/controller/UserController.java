@@ -30,9 +30,17 @@ public class UserController {
 	
 	private final UserService service;
 	
-	@GetMapping
+	@GetMapping("/")
 	//@PreAuthorize
 	public ResponseEntity<List<User>> findAll(Pageable pageable){
+		
+		try {
+			service.findAll(pageable);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		
 		List<User> list = service.findAll(pageable);
 		
 		String remoteAddress = ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes())
@@ -49,7 +57,7 @@ public class UserController {
 		return ResponseEntity.ok().body(obj);
 	}
 	
-	@PostMapping
+	@PostMapping("/")
 	public ResponseEntity<User> insert(@RequestBody User obj){
 		obj = service.insert(obj);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")

@@ -1,6 +1,11 @@
 package com.imoob.hml.model;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +30,13 @@ public class RegisterRequest implements Serializable{
 	private String lastName;
 	private String email;
 	private String cpf;
+	private String cepAddress;
+	private String numberAddress;
+	private String complementAddress;
+	
+	@JsonFormat(pattern = "dd/MM/yyyy")
+	private LocalDate birthDate;
+		
 	private String password;
 	
 	

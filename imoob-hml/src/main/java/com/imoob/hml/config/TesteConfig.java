@@ -1,8 +1,10 @@
 package com.imoob.hml.config;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Calendar;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +13,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.imoob.hml.model.Role;
 import com.imoob.hml.model.User;
-import com.imoob.hml.model.UserRole;
 import com.imoob.hml.model.enums.UserStatus;
 import com.imoob.hml.repository.RoleRepository;
 import com.imoob.hml.repository.UserRepository;
@@ -34,13 +35,14 @@ public class TesteConfig implements CommandLineRunner{
 	@Override
 	public void run(String... args) throws Exception {
 		User user1 = User.builder()
-				.birthDate(Instant.parse("2000-07-06T00:00:00Z"))
+				.birthDate(LocalDate.parse("10/09/2000", DateTimeFormatter.ofPattern("dd/MM/yyyy")))
 				.cepAddress("13473758")
-				.cpf("48274702867")
+				.cpf("07553675105")
 				.created(Instant.now())
-				.email("higorrg2000@hotmail.com")
-				.firstName("Higor")
-				.lastName("Rangel")
+				.email("rood_alves@hotmail.com")
+				.firstName("Rodrigo")
+				.middleNames("Alves")
+				.lastName("Ribeiro")
 				.lastUpdate(Instant.now())
 				.numberAddress("1008")
 				.password(passwordEncoder.encode("45945261"))

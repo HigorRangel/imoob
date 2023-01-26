@@ -2,12 +2,14 @@ package com.imoob.hml.model;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.validator.constraints.br.CPF;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -89,6 +91,7 @@ public class User implements Serializable, UserDetails {
 	@Getter
 	@Setter
 	@Column(length = 11)
+	@CPF
 	private String cpf;
 
 	@Getter
@@ -100,11 +103,17 @@ public class User implements Serializable, UserDetails {
 	@Setter
 	@Column(length = 12)
 	private String numberAddress;
+	
+	@Getter
+	@Setter
+	@Column(length = 50)
+	private String complementAddress;
 
 	@Getter
 	@Setter
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "GMT")
-	private Instant birthDate;
+//	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "GMT")
+	@JsonFormat(pattern = "dd/MM/yyyy")
+	private LocalDate birthDate;
 
 	@Getter
 	@Setter
@@ -146,38 +155,45 @@ public class User implements Serializable, UserDetails {
 	private Set<Permission> permissions = new HashSet<>();
 	
 	
-	
+
+	@JsonIgnore
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 //	    return List.of(new SimpleGrantedAuthority(roles.));
 		return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).toList();
 	}
 
+	@JsonIgnore
 	@Override
 	public String getPassword() {
 		return password;
 	}
 
+	@JsonIgnore
 	@Override
 	public String getUsername() {
 		return email;
 	}
-
+	
+	@JsonIgnore
 	@Override
 	public boolean isAccountNonExpired() {
 		return !(UserStatus.valueOf(status) == UserStatus.EXPIRED);
 	}
-
+	
+	@JsonIgnore
 	@Override
 	public boolean isAccountNonLocked() {
 		return !(UserStatus.valueOf(status) == UserStatus.BLOCKED);
 	}
 
+	@JsonIgnore
 	@Override
 	public boolean isCredentialsNonExpired() {
 		return true;
 	}
 
+	@JsonIgnore
 	@Override
 	public boolean isEnabled() {
 		return (UserStatus.valueOf(status) == UserStatus.ACTIVE);
