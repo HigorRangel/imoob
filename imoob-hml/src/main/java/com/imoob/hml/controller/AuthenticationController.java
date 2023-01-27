@@ -19,14 +19,25 @@ import lombok.RequiredArgsConstructor;
 public class AuthenticationController {
 
 	private final AuthenticationService service;
-	
+
 	@PostMapping("/register")
-	public ResponseEntity<AuthenticationResponse> register (@RequestBody RegisterRequest request){
-		return ResponseEntity.ok(service.register(request));
+	public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
+		
+		AuthenticationResponse rr = service.register(request);
+		return ResponseEntity.ok(rr);
+		
+//		try {
+//			AuthenticationResponse rr = service.register(request);
+//			return ResponseEntity.ok(rr);
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			return null;
+//		}
 	}
-	
+
 	@PostMapping("/authenticate")
-	public ResponseEntity<AuthenticationResponse> register (@RequestBody AuthenticationRequest request){
+	public ResponseEntity<AuthenticationResponse> register(@RequestBody AuthenticationRequest request) {
 		return ResponseEntity.ok(service.authenticate(request));
 	}
 }

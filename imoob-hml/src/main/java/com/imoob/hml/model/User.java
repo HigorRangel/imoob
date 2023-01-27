@@ -29,6 +29,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -41,7 +42,6 @@ import lombok.Setter;
 @Entity
 @Table(name = "tb_user")
 @AllArgsConstructor
-@RequiredArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
 @Builder
@@ -54,7 +54,7 @@ public class User implements Serializable, UserDetails {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@NonNull
+	@NotNull
 	@Getter
 	@Setter
 	@Column(length = 25)
@@ -65,13 +65,13 @@ public class User implements Serializable, UserDetails {
 	@Setter
 	private String middleNames;
 
-	@NonNull
+	@NotNull
 	@Getter
 	@Setter
 	@Column(length = 25)
 	private String lastName;
 
-	@NonNull
+	@NotNull
 	@Getter
 	@Setter
 	@Column(length = 50)
@@ -82,12 +82,12 @@ public class User implements Serializable, UserDetails {
 //	@NonNull
 //	private UserStatus status;
 
-	@NonNull
+	@NotNull
 	private Character status;
 
 //	private Character status;
 
-	@NonNull
+	@NotNull
 	@Getter
 	@Setter
 	@Column(length = 11)

@@ -140,4 +140,23 @@ public class UserService {
 	}
 	
 	
+	private void validateEmptyFields(User user) {
+		if(StringUtils.isNullOrEmpty(user.getFirstName())) {
+			throw new GeneralException("Campo Primeiro Nome não preenchido.");
+		}
+		if(StringUtils.isNullOrEmpty(user.getLastName())) {
+			throw new GeneralException("Campo Último Nome não preenchido");
+		}
+		if(StringUtils.isNullOrEmpty(user.getEmail())) {
+			throw new GeneralException("Campo Email não preenchido");
+		}
+		if(user.getStatus() == null) {
+			user.setStatus(UserStatus.ACTIVE);
+		}
+		if(StringUtils.isNullOrEmpty(user.getEmail())) {
+			throw new GeneralException("Campo Email não preenchido");
+		}
+	}
+	
+	
 }

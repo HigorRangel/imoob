@@ -2,6 +2,8 @@ package com.imoob.hml.model.exceptions;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -26,13 +28,15 @@ public class ValidationException implements Serializable{/**
 	private static final long serialVersionUID = 1L;
 	
 	@JsonDeserialize(using = InstantDeserializer.class)
-	@JsonSerialize(using = InstantSerializer.class)
+	@JsonSerialize(using = InstantSerializer.class) 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
 	private Instant timestamp;
 	private Integer status;
-	private String error;
-	private String message;
+//	private String error;
+//	private String message;
 	private String path;
+	
+	private List<Map<String, String>>constraints;
 	
 	
 	

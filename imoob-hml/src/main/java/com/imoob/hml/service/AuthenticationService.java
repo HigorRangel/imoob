@@ -1,5 +1,7 @@
 package com.imoob.hml.service;
 
+import java.time.Instant;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,6 +27,8 @@ public class AuthenticationService {
 	private final JwtService jwtService;
 	private final AuthenticationManager authenticationManager;
 	
+	private final UserService userService;
+	
 	public AuthenticationResponse register(RegisterRequest request) {
 
 		var user = User.builder()
@@ -34,9 +38,17 @@ public class AuthenticationService {
 				.email(request.getEmail())
 				.status(UserStatus.ACTIVE)
 				.cpf(request.getCpf()) 
-				.password(passwordEncoder.encode(request.getPassword())).build();
+				.password(passwordEncoder.encode(request.getPassword()))
+				.birthDate(request.getBirthDate())
+				.cepAddress(request.getCepAddress())
+				.lastUpdate(Instant.now())
+				.created(Instant.now())
+				.numberAddress(request.getNumberAddress())
+				.complementAddress(request.getComplementAddress())
+				.build();
 		
-		repository.save(user);
+		user = userService.insert(user);
+//		repository.save(user);
 		
 		var jwtToken = jwtService.generateToken(user);
 				
