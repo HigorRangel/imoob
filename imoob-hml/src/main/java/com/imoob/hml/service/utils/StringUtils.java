@@ -40,4 +40,14 @@ public class StringUtils {
 	public static boolean containsDiacriticalMarks(String value) {
 		return !Normalizer.isNormalized(value, Form.NFD);
 	}
+	
+	
+	/**
+	 * Checks if value is only numbers
+	 * @param value
+	 * @return
+	 */
+	public static boolean isOnlyNumbers(String value) {
+		return value.matches("[0-9]+");
+	}
 }

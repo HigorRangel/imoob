@@ -8,10 +8,14 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import com.imoob.hml.model.User;
+
 @Repository
 public interface UserRepository extends CrudRepository<User, Long> {
-	
+
 	Optional<User> findByEmail(String email);
-	
+
 	List<User> findAll(Pageable pageable);
+
+	User findByCpf(String cpf);
+
 }

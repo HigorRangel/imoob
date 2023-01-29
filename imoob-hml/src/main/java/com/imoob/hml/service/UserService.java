@@ -10,6 +10,12 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
 import com.imoob.hml.model.User;
 import com.imoob.hml.model.enums.UserStatus;
 import com.imoob.hml.repository.UserRepository;
@@ -26,35 +32,38 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserService {
 	private final UserRepository repository;
-	
-	public List<User> findAll(Pageable pageable){
+	private ObjectMapper objectMapper = JsonMapper.builder().findAndAddModules().build();
+
+	public List<User> findAll(Pageable pageable) {
 		return repository.findAll(pageable);
 	}
-	
+
 	public User findUserById(Long id) {
 		Optional<User> obj = repository.findById(id);
 		return obj.orElseThrow(() -> new ResourceNotFoundException(id, User.class));
 	}
-	
-	public User insert (User obj) {
+
+	public User insert(User obj) {
+		validateEmptyFields(obj);
+		validateDuplicatedUser(obj);
 		return repository.save(obj);
 	}
-	
+
 	public void delete(Long id) {
 		try {
 			repository.deleteById(id);
-		}
-		catch (EmptyResultDataAccessException e) {
+		} catch (EmptyResultDataAccessException e) {
 			throw new ResourceNotFoundException(id, User.class);
-		}
-		catch (DataIntegrityViolationException e) {
+		} catch (DataIntegrityViolationException e) {
 			throw new DatabaseException(e.getMessage());
 		}
 	}
-	
+
 	public User update(Long id, User obj) {
 		try {
+			validateEmptyFields(obj);
 			User entity = repository.findById(id).get();
+			validateDuplicatedUserUpdated(entity, obj);
 			updateData(entity, obj);
 			return repository.save(entity);
 		} catch (NoSuchElementException e) {
@@ -73,90 +82,197 @@ public class UserService {
 		entity.setNumberAddress(obj.getNumberAddress());
 		entity.setBirthDate(obj.getBirthDate());
 		entity.setLastUpdate(Instant.now());
-		
+
 	}
 
-	public User patchUpdate(Long id, User obj) {
+	public User patchUpdate(Long id, JsonPatch patch) {
 		try {
 			User currentUser = repository.findById(id).get();
-			
-			if(!StringUtils.isNullOrEmpty(obj.getFirstName())) {
-				validateSpaceBetweenNames(obj.getFirstName().trim(), "Primeiro Nome");
-				currentUser.setFirstName(obj.getFirstName().trim());
-			}
-			
-			if(!StringUtils.isNullOrEmpty(obj.getMiddleNames())) {
-				validateSpaceBetweenNames(obj.getFirstName().trim(), "Primeiro Nome");
-				currentUser.setMiddleNames(obj.getMiddleNames());
-			}
-			if(!StringUtils.isNullOrEmpty(obj.getLastName())) {
-				validateSpaceBetweenNames(obj.getLastName().trim(), "Último Nome");
-				currentUser.setLastName(obj.getLastName().trim());
-			}
-			if(!StringUtils.isNullOrEmpty(obj.getEmail())) {
-				validateEmail(obj.getEmail());
-				currentUser.setEmail(obj.getEmail().trim());
-			}
-			if(obj.getStatus() != null) {
-				validateUserStatus(obj.getStatus());
-				currentUser.setEmail(obj.getEmail().trim());
-			}
-			
-			return repository.save(currentUser);
-			
+			User userPatched = applyPatchToUser(patch, currentUser);
+
+			validatePatchAttributes(userPatched, currentUser);
+
+			return repository.save(userPatched);
+		} catch (JsonPatchException | JsonProcessingException e) {
+			throw new GeneralException("Não foi atualizar o registro. Verifique as informações inseridas.");
 		} catch (NoSuchElementException e) {
 			throw new ResourceNotFoundException(id, User.class);
 		}
 	}
-	
+
+	private void validatePatchAttributes(User userPatched, User currentUser) {
+		
+		
+		if (!StringUtils.isNullOrEmpty(userPatched.getFirstName())) {
+			validateSpaceBetweenNames(userPatched.getFirstName().trim(), "Primeiro Nome");
+		}
+
+		if (!StringUtils.isNullOrEmpty(userPatched.getMiddleNames())) {
+			validateSpaceBetweenNames(userPatched.getFirstName().trim(), "Nomes do meio");
+		}
+		if (!StringUtils.isNullOrEmpty(userPatched.getLastName())) {
+			validateSpaceBetweenNames(userPatched.getLastName().trim(), "Último Nome");
+		}
+		if (!StringUtils.isNullOrEmpty(userPatched.getEmail())) {
+			validateEmail(userPatched.getEmail());
+			validateDuplicatedUserUpdated(currentUser, userPatched);
+		}
+		if (userPatched.getStatus() != null) {
+			validateUserStatus(userPatched.getStatus());
+		}
+
+		if (userPatched.getCpf() != null) {
+			validateDuplicatedUserUpdated(currentUser, userPatched);
+		}
+
+		if (userPatched.getCepAddress() != null) {
+			
+		}
+
+	}
+
+//	
+//	private void validatePatch(JsonPatch patch, User userPatched) {
+//		if(patch.)
+//		
+//	}
+
+	private User applyPatchToUser(JsonPatch patch, User targetUser)
+			throws JsonProcessingException, IllegalArgumentException, JsonPatchException {
+		JsonNode patched = patch.apply(objectMapper.convertValue(targetUser, JsonNode.class));
+		return objectMapper.treeToValue(patched, User.class);
+	}
+
+//	public User patchUpdate(Long id, User obj) {
+//		try {
+//			User currentUser = repository.findById(id).get();
+//
+//			if (!StringUtils.isNullOrEmpty(obj.getFirstName())) {
+//				validateSpaceBetweenNames(obj.getFirstName().trim(), "Primeiro Nome");
+//				currentUser.setFirstName(obj.getFirstName().trim());
+//			}
+//
+//			if (!StringUtils.isNullOrEmpty(obj.getMiddleNames())) {
+//				validateSpaceBetweenNames(obj.getFirstName().trim(), "Primeiro Nome");
+//				currentUser.setMiddleNames(obj.getMiddleNames());
+//			}
+//			if (!StringUtils.isNullOrEmpty(obj.getLastName())) {
+//				validateSpaceBetweenNames(obj.getLastName().trim(), "Último Nome");
+//				currentUser.setLastName(obj.getLastName().trim());
+//			}
+//			if (!StringUtils.isNullOrEmpty(obj.getEmail())) {
+//				validateEmail(obj.getEmail());
+//				validateDuplicatedUserUpdated(currentUser, obj);
+//				currentUser.setEmail(obj.getEmail().trim());
+//			}
+//			if (obj.getStatus() != null) {
+//				validateUserStatus(obj.getStatus());
+//				currentUser.setStatus(obj.getStatus());
+//			}
+//
+//			if (obj.getCpf() != null) {
+//				obj.setCpf(fixCpf(obj.getCpf()));
+//				validateDuplicatedUserUpdated(currentUser, obj);
+//				currentUser.setCpf(obj.getCpf());
+//			}
+//
+//			if (obj.getCepAddress() != null) {
+//
+//			}
+//
+//			return repository.save(currentUser);
+//
+//		} catch (NoSuchElementException e) {
+//			throw new ResourceNotFoundException(id, User.class);
+//		}
+//	}
+
 	/**
 	 * Validate if user Status
+	 * 
 	 * @param status
 	 */
 	private void validateUserStatus(UserStatus status) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/**
 	 * Validates the email
+	 * 
 	 * @param email
 	 */
 	private void validateEmail(@NonNull String email) {
-		if(!PersonalDataUtils.isValidEmailAddress(email)) {
+		if (!PersonalDataUtils.isValidEmailAddress(email)) {
 			throw new GeneralException("O e-mail é inválido.");
 		}
 	}
 
 	/**
 	 * Validates if there are spaces between the names
+	 * 
 	 * @param name
 	 * @param fieldName
 	 */
 	private void validateSpaceBetweenNames(String name, String fieldName) {
-		if(name.contains(" ")) {
-			throw new GeneralException("Não é permitido espaços no campo [" + fieldName + "]. (Caso haja mais nomes/sobrenomes, insira nos nomes do meio.)");
+		if (name.contains(" ")) {
+			throw new GeneralException("Não é permitido espaços no campo [" + fieldName
+					+ "]. (Caso haja mais nomes/sobrenomes, insira nos nomes do meio.)");
 		}
 	}
-	
-	
+
+	/**
+	 * Validates if there are empty fields
+	 * 
+	 * @param user
+	 */
 	private void validateEmptyFields(User user) {
-		if(StringUtils.isNullOrEmpty(user.getFirstName())) {
+		if (StringUtils.isNullOrEmpty(user.getFirstName())) {
 			throw new GeneralException("Campo Primeiro Nome não preenchido.");
 		}
-		if(StringUtils.isNullOrEmpty(user.getLastName())) {
-			throw new GeneralException("Campo Último Nome não preenchido");
+		if (StringUtils.isNullOrEmpty(user.getLastName())) {
+			throw new GeneralException("Campo Último Nome não preenchido.");
 		}
-		if(StringUtils.isNullOrEmpty(user.getEmail())) {
-			throw new GeneralException("Campo Email não preenchido");
+		if (StringUtils.isNullOrEmpty(user.getEmail())) {
+			throw new GeneralException("Campo Email não preenchido.");
 		}
-		if(user.getStatus() == null) {
+		if (user.getStatus() == null) {
 			user.setStatus(UserStatus.ACTIVE);
 		}
-		if(StringUtils.isNullOrEmpty(user.getEmail())) {
-			throw new GeneralException("Campo Email não preenchido");
+		if (StringUtils.isNullOrEmpty(user.getEmail())) {
+			throw new GeneralException("Campo Email não preenchido.");
+		}
+		if (StringUtils.isNullOrEmpty(user.getCpf())) {
+			throw new GeneralException("Campo CPF não preenchido.");
 		}
 	}
-	
-	
+
+	/**
+	 * Validates if there are already users with the data provided
+	 * 
+	 * @param user
+	 */
+	private void validateDuplicatedUser(User user) {
+		if (repository.findByCpf(user.getCpf()) != null
+				|| repository.findByEmail(user.getEmail()).orElseGet(() -> null) != null) {
+			throw new DatabaseException("Já existe um registro com os dados informados.");
+		}
+	}
+
+	/**
+	 * Validates if there are already users with the data provided on update
+	 * 
+	 * @param user
+	 */
+	private void validateDuplicatedUserUpdated(User oldUser, User newUser) {
+		User userByCPF = repository.findByCpf(newUser.getCpf());
+		Optional<User> userByEmail = repository.findByEmail(newUser.getEmail());
+
+		if ((userByCPF != null && !userByCPF.getCpf().equals(oldUser.getCpf()))
+				|| (userByEmail.orElseGet(() -> null) != null
+						&& !userByEmail.get().getEmail().equals(oldUser.getEmail()))) {
+			throw new DatabaseException("Já existe um registro com os dados informados.");
+		}
+	}
+
 }

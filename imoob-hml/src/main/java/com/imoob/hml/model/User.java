@@ -17,9 +17,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.imoob.hml.model.enums.UserStatus;
+import com.imoob.hml.service.utils.converters.CepConverter;
+import com.imoob.hml.service.utils.converters.CpfConverter;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -81,7 +84,7 @@ public class User implements Serializable, UserDetails {
 //	@Enumerated(EnumType.STRING)
 //	@NonNull
 //	private UserStatus status;
-
+	
 	@NotNull
 	private Character status;
 
@@ -92,11 +95,13 @@ public class User implements Serializable, UserDetails {
 	@Setter
 	@Column(length = 11)
 	@CPF
+	@Convert(converter = CpfConverter.class)
 	private String cpf;
 
 	@Getter
 	@Setter
 	@Column(length = 8)
+	@Convert(converter = CepConverter.class)
 	private String cepAddress;
 
 	@Getter

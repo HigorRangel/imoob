@@ -18,6 +18,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.github.fge.jsonpatch.JsonPatch;
 import com.imoob.hml.model.User;
 import com.imoob.hml.service.UserService;
 
@@ -77,9 +78,15 @@ public class UserController {
 		return ResponseEntity.ok(obj);
 	}
 	
-	@PatchMapping(value = "/{id}")
-	public ResponseEntity<User> patchUpdate(@PathVariable Long id, @RequestBody User obj){
-		obj = service.patchUpdate(id, obj);
-		return ResponseEntity.ok(obj);
+//	@PatchMapping(value = "/{id}")
+//	public ResponseEntity<User> patchUpdate(@PathVariable Long id, @RequestBody User obj){
+//		obj = service.patchUpdate(id, obj);
+//		return ResponseEntity.ok(obj);
+//	}
+	
+	@PatchMapping(path = "/{id}", consumes = "application/json-patch+json")
+	public ResponseEntity<User> patchUpdate(@PathVariable Long id, @RequestBody JsonPatch patch){
+			User user = service.patchUpdate(id, patch);
+			return ResponseEntity.ok(user);
 	}
 }
