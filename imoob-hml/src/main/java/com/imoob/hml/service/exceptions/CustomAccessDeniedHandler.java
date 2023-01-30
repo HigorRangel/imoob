@@ -32,7 +32,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 			String error = "User not allowed to perform this task.";
 
 			StandardError err = new StandardError(Instant.now(), HttpStatus.FORBIDDEN.value(), error, "Access Denied",
-					request.getRequestURI());
+					accessDeniedException.getCause().getMessage(), request.getRequestURI());
 
 			response.setContentType("application/json");
 

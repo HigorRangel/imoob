@@ -34,9 +34,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 	private final JwtService jwtService;
 
 	private final UserDetailsService userDetailsService;
-	
+
 	private final GeneralUtils generalUtils;
-	
+
 	private final PermissionService permissionService;
 
 	@Override
@@ -45,7 +45,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 		final String authHeader = request.getHeader("Authorization");
 		final String userEmail;
 		final String jwtToken;
-		
+
 		System.out.println(request.getRequestURI());
 
 		try {
@@ -65,27 +65,25 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 					authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 					SecurityContextHolder.getContext().setAuthentication(authToken);
 				}
-				
-				if(!permissionService.validatePermission(request.getRequestURI(), userDetails)) {
-					
+
+				if (!permissionService.validatePermission(request.getRequestURI(), userDetails)) {
+
 				}
 			}
 			filterChain.doFilter(request, response);
 		} catch (ExpiredJwtException e) {
 			errorExpiredJwt(request, response, e);
-			
-		}
-		catch (UsernameNotFoundException e) {
+
+		} catch (UsernameNotFoundException e) {
 			response.setStatus(HttpStatus.FORBIDDEN.value());
 			String error = "JWT inválido. Usuário não encontrado.";
 
 			StandardError err = new StandardError(Instant.now(), HttpStatus.FORBIDDEN.value(), error, e.getMessage(),
-					request.getRequestURI());
+					e.getCause().getMessage(), request.getRequestURI());
 
 			response.setContentType("application/json");
 			response.getWriter().write(generalUtils.convertObjectToJson(err));
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -102,7 +100,5 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 		response.setContentType("application/json");
 		response.getWriter().write(generalUtils.convertObjectToJson(err));
 	}
-
-	
 
 }

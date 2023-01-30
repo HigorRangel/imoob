@@ -27,7 +27,7 @@ public class EntityExceptionHandler {
 		String error = "Há campo(s) não preenchido(s) corretamente.";
 		HttpStatus status = HttpStatus.BAD_REQUEST;
 		
-		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
+		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), e.getCause().getMessage(), request.getRequestURI());
 	
 		return ResponseEntity.status(status).body(err);
 	}
@@ -37,7 +37,7 @@ public class EntityExceptionHandler {
 		String error = "Usuário não encontrado.";
 		HttpStatus status = HttpStatus.NOT_FOUND;
 		
-		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
+		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), e.getCause().getMessage(), request.getRequestURI());
 	
 		return ResponseEntity.status(status).body(err);
 	}
@@ -65,7 +65,7 @@ public class EntityExceptionHandler {
 		String error = "Valor nulo.";
 		HttpStatus status = HttpStatus.BAD_REQUEST;
 		
-		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
+		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), e.getCause().getMessage(), request.getRequestURI());
 	
 		return ResponseEntity.status(status).body(err);
 	}

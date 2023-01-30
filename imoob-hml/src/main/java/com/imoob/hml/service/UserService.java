@@ -1,15 +1,21 @@
 package com.imoob.hml.service;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,8 +38,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserService {
 	private final UserRepository repository;
-	private ObjectMapper objectMapper = JsonMapper.builder().findAndAddModules().build();
+	private ObjectMapper objectMapper = JsonMapper.builder().findAndAddModules().build().setSerializationInclusion(JsonInclude.Include.NON_NULL);
+	
+	private final PasswordEncoder passwordEncoder;
 
+
+	
 	public List<User> findAll(Pageable pageable) {
 		return repository.findAll(pageable);
 	}
@@ -94,15 +104,15 @@ public class UserService {
 
 			return repository.save(userPatched);
 		} catch (JsonPatchException | JsonProcessingException e) {
-			throw new GeneralException("Não foi atualizar o registro. Verifique as informações inseridas.");
+			throw new GeneralException("Não foi possível atualizar o registro. Verifique as informações inseridas.", e,
+					User.class);
 		} catch (NoSuchElementException e) {
 			throw new ResourceNotFoundException(id, User.class);
 		}
 	}
 
 	private void validatePatchAttributes(User userPatched, User currentUser) {
-		
-		
+
 		if (!StringUtils.isNullOrEmpty(userPatched.getFirstName())) {
 			validateSpaceBetweenNames(userPatched.getFirstName().trim(), "Primeiro Nome");
 		}
@@ -125,10 +135,43 @@ public class UserService {
 			validateDuplicatedUserUpdated(currentUser, userPatched);
 		}
 
-		if (userPatched.getCepAddress() != null) {
-			
+		if (userPatched.getBirthDate() != null) {
+			validateBirthDate(userPatched.getBirthDate());
+		}
+		
+		if(userPatched.getPassword() != null && !userPatched.getPassword().startsWith("$2a$")) {
+			validatePassword(userPatched.getPassword());
+			userPatched.setPassword(passwordEncoder.encode(userPatched.getPassword()));
 		}
 
+	}
+
+	/**
+	 * Validates that the user's password is alphanumeric, has between 8 and 16 characters
+	 *  and has at least one symbol. 
+	 * @param password
+	 */
+	private void validatePassword(String password) {
+	    Pattern pattern = Pattern.compile("^(?=.*[A-Z])(?=.*[a-zA-Z])(?=.*[-:;@$!%*#<>?&{}\\[\\]\\?\\~_±^¨`´=+\\\\-\\\\/\\']).{8,16}$");
+	    Matcher matcher = pattern.matcher(password);
+	    
+	    if (!matcher.matches()) {
+	    	throw new GeneralException("Senha inválida. Certifique-se que a senha tenha pelo menos uma letra maiúscula, um número e um símbolo. A senha deve conter entre 8 e 16 caracteres.");
+	    } 
+	}
+
+	/**
+	 * Validates if user is over 16 years old
+	 * @param birthDate
+	 */
+	private void validateBirthDate(LocalDate birthDate) {
+		LocalDate today = LocalDate.now() ;
+		
+		Period diff = Period.between(birthDate, today);
+
+		if(diff.getYears() < 16) {
+			throw new GeneralException("O usuário deve ter mais de 16 anos.", User.class);
+		}
 	}
 
 //	

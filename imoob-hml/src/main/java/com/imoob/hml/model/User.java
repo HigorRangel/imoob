@@ -135,7 +135,6 @@ public class User implements Serializable, UserDetails {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
 	private Instant lastUpdate;
 
-	@JsonIgnore
 	@NonNull
 	@Setter
 	private String password;
@@ -168,7 +167,6 @@ public class User implements Serializable, UserDetails {
 		return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).toList();
 	}
 
-	@JsonIgnore
 	@Override
 	public String getPassword() {
 		return password;

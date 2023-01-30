@@ -19,7 +19,10 @@ public class GeneralExceptionHandler {
 		String error = "Bad request.";
 		HttpStatus status = HttpStatus.BAD_REQUEST;
 		
-		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
+		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), 
+				(e.getCause() != null? e.getCause().getMessage() : null), request.getRequestURI(), 
+				(e.getClassObject() != null? e.getClassObject().getSimpleName() : null), 
+				(e.getAttributeName()));
 	
 		return ResponseEntity.status(status).body(err);
 	}

@@ -20,6 +20,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.github.fge.jsonpatch.JsonPatch;
 import com.imoob.hml.model.User;
+import com.imoob.hml.model.DTO.usuario.UserDTO;
 import com.imoob.hml.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -33,7 +34,7 @@ public class UserController {
 	
 	@GetMapping("/")
 	//@PreAuthorize
-	public ResponseEntity<List<User>> findAll(Pageable pageable){
+	public ResponseEntity<List<UserDTO>> findAll(Pageable pageable){
 		
 		try {
 			service.findAll(pageable);
@@ -48,7 +49,10 @@ public class UserController {
 				.getRequest().getRemoteAddr();
 		
 		System.out.println(remoteAddress);
-		return ResponseEntity.ok().body(list);
+		
+		List<UserDTO> listDTO = list.stream().map(user -> new UserDTO(user)).toList();
+		
+		return ResponseEntity.ok().body(listDTO);
 	}
 	
 	@GetMapping(value = "/{id}")

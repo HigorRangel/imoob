@@ -21,7 +21,7 @@ public class AuthenticationExceptionHandler {
 		String error = "Bad Credentials. Try again.";
 		HttpStatus status = HttpStatus.FORBIDDEN;
 		
-		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
+		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), e.getCause().getMessage(), request.getRequestURI());
 	
 		return ResponseEntity.status(status).body(err);
 	}
@@ -31,7 +31,7 @@ public class AuthenticationExceptionHandler {
 		String error = "JWT Expired..";
 		HttpStatus status = HttpStatus.FORBIDDEN;
 		
-		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
+		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), e.getCause().getMessage(), request.getRequestURI());
 	
 		return ResponseEntity.status(status).body(err);
 	}
