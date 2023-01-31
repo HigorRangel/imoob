@@ -3,6 +3,7 @@ package com.imoob.hml.model;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -13,6 +14,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -51,9 +53,14 @@ public class Permission implements Serializable{
 	@Column(length = 150)
 	private String description;
 	
+	@JsonIgnore
+	@OneToMany(mappedBy = "id.permission")
+	private Set<UserPermission> users = new HashSet<>();
+	
 	
 	@JsonIgnore
-	@ManyToMany(mappedBy = "permissions", cascade = CascadeType.MERGE)
-	private Set<User> users = new HashSet<>();
+	private Set<User> getUsers(){
+		return users.stream().map(userPermission -> userPermission.getId().getUser()).collect(Collectors.toSet());
+	}
 	
 }

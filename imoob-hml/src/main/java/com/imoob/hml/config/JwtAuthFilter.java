@@ -79,7 +79,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 			String error = "JWT inválido. Usuário não encontrado.";
 
 			StandardError err = new StandardError(Instant.now(), HttpStatus.FORBIDDEN.value(), error, e.getMessage(),
-					e.getCause().getMessage(), request.getRequestURI());
+					e.getCause(), request.getRequestURI());
 
 			response.setContentType("application/json");
 			response.getWriter().write(generalUtils.convertObjectToJson(err));

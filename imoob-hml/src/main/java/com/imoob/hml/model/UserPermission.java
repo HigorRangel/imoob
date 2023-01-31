@@ -3,6 +3,7 @@ package com.imoob.hml.model;
 import java.io.Serializable;
 import java.time.Instant;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.imoob.hml.model.pk.UserPermissionPk;
 import com.imoob.hml.service.utils.converters.BooleanConverter;
 
@@ -15,6 +16,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Entity
@@ -41,6 +43,32 @@ public class UserPermission  implements Serializable{
 	@Convert(converter = BooleanConverter.class)
 	private Boolean delete;
 	
-	
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
 	private Instant assignmentDate;
+	
+	public UserPermission(User user, Permission permission, Boolean create, Boolean edit, Boolean delete, Instant assignmentDate) {
+		this.id.setUser(user);
+		this.id.setPermission(permission);
+		this.create = create;
+		this.edit = edit;
+		this.delete = delete;
+		this.assignmentDate = assignmentDate;
+	}
+	
+	
+	public Permission getPermission() {
+		return this.id.getPermission();
+	}
+	
+	public void setPermission(Permission permission) {
+		this.id.setPermission(permission);
+	}
+	
+	public User getUser() {
+		return this.id.getUser();
+	}
+	
+	public void setUser(User user) {
+		this.id.setUser(user);
+	}
 }

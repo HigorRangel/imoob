@@ -4,17 +4,21 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.HashSet;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.imoob.hml.model.Permission;
 import com.imoob.hml.model.Role;
 import com.imoob.hml.model.User;
+import com.imoob.hml.model.UserPermission;
 import com.imoob.hml.model.enums.UserStatus;
+import com.imoob.hml.repository.PermissionRepository;
 import com.imoob.hml.repository.RoleRepository;
+import com.imoob.hml.repository.UserPermissionRepository;
 import com.imoob.hml.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -28,8 +32,11 @@ public class TesteConfig implements CommandLineRunner{
 	
 	private final RoleRepository roleRepository;
 	
+	private final PermissionRepository permissionRepository;
+	
 	private final PasswordEncoder passwordEncoder;
 
+	private final UserPermissionRepository userPermissionRepository;
 //	private final UserRoleRepository userRoleRepository;
 		
 	@Override
@@ -48,6 +55,7 @@ public class TesteConfig implements CommandLineRunner{
 				.password(passwordEncoder.encode("45945261"))
 				.status(UserStatus.ACTIVE)
 				.roles(new ArrayList<>())
+				.permissions(new HashSet<UserPermission>())
 				.build();
 		
 		
@@ -63,14 +71,31 @@ public class TesteConfig implements CommandLineRunner{
 				.displayName("Acesso Mínimo")
 				.name("ACESSO_MINIMO").build();
 		
+		
+		Permission permission1 = Permission.builder()
+				.description("Cadastro de Usuário")
+				.displayName("Cadastro de Usuário")
+				.name("CADASTRO_USUARIO")
+				.build();
+		
 		role1 = roleRepository.save(role1);
 		role2 = roleRepository.save(role2);
 		
+		permission1 = permissionRepository.save(permission1);
 		
 		user1.getRoles().add(role1);
 		user1.getRoles().add(role2);
 		
 		userRepository.save(user1);
+
+		
+		UserPermission up1 = new UserPermission(user1, permission1, true, true, true, Instant.now());
+		userPermissionRepository.save(up1);
+		
+		
+		
+
+		
 
 		
 //		UserRole ur1 = new UserRole(user1, role1);

@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.validator.constraints.br.CPF;
 import org.springframework.security.core.GrantedAuthority;
@@ -31,6 +33,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -39,14 +42,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "tb_user")
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
 @Builder
 public class User implements Serializable, UserDetails {
 
@@ -84,7 +85,7 @@ public class User implements Serializable, UserDetails {
 //	@Enumerated(EnumType.STRING)
 //	@NonNull
 //	private UserStatus status;
-	
+
 	@NotNull
 	private Character status;
 
@@ -108,7 +109,7 @@ public class User implements Serializable, UserDetails {
 	@Setter
 	@Column(length = 12)
 	private String numberAddress;
-	
+
 	@Getter
 	@Setter
 	@Column(length = 50)
@@ -147,24 +148,17 @@ public class User implements Serializable, UserDetails {
 	@Getter
 	@Setter
 	@ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-	@JoinTable(name="tb_user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+	@JoinTable(name = "tb_user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private List<Role> roles = new ArrayList<Role>();
-	
-	
-	
-	@Getter
-	@Setter
-	@ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-	@JoinTable(name = "tb_user_permission", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name="permission_id"))
-	private Set<Permission> permissions = new HashSet<>();
-	
-	
+
+	@OneToMany(mappedBy = "id.user", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+	private Set<UserPermission> permissions = new HashSet<UserPermission>();
 
 	@JsonIgnore
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 //	    return List.of(new SimpleGrantedAuthority(roles.));
-		return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).toList();
+		return permissions.stream().map(userPermission -> new SimpleGrantedAuthority(userPermission.getPermission().getName())).toList();
 	}
 
 	@Override
@@ -177,13 +171,13 @@ public class User implements Serializable, UserDetails {
 	public String getUsername() {
 		return email;
 	}
-	
+
 	@JsonIgnore
 	@Override
 	public boolean isAccountNonExpired() {
 		return !(UserStatus.valueOf(status) == UserStatus.EXPIRED);
 	}
-	
+
 	@JsonIgnore
 	@Override
 	public boolean isAccountNonLocked() {
@@ -210,6 +204,15 @@ public class User implements Serializable, UserDetails {
 		this.status = status.getStatusKey();
 	}
 
+	public Set<Permission> getPermissions() {
+		return permissions.stream().map(userPermission -> userPermission.getId().getPermission())
+				.collect(Collectors.toSet());
+	}
+
+	public void setPermissions(Set<UserPermission> permissions) {
+		this.permissions = permissions;
+	}
+
 //	
 //	public Set<Role> getRoles() {
 //		Set<Role> set = new HashSet<Role>();
@@ -219,6 +222,30 @@ public class User implements Serializable, UserDetails {
 //		return set;
 //	}
 
+	@Override
+	public int hashCode() {
+		return Objects.hash(birthDate, cepAddress, complementAddress, cpf, created, email, firstName, id, inactived,
+				lastName, lastUpdate, middleNames, numberAddress, password, status);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		User other = (User) obj;
+		return Objects.equals(birthDate, other.birthDate) && Objects.equals(cepAddress, other.cepAddress)
+				&& Objects.equals(complementAddress, other.complementAddress) && Objects.equals(cpf, other.cpf)
+				&& Objects.equals(created, other.created) && Objects.equals(email, other.email)
+				&& Objects.equals(firstName, other.firstName) && Objects.equals(id, other.id)
+				&& Objects.equals(inactived, other.inactived) && Objects.equals(lastName, other.lastName)
+				&& Objects.equals(lastUpdate, other.lastUpdate) && Objects.equals(middleNames, other.middleNames)
+				&& Objects.equals(numberAddress, other.numberAddress) && Objects.equals(password, other.password)
+				&& Objects.equals(status, other.status);
+	}
 
 	public static class UserBuilder {
 		Character status;

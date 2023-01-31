@@ -29,7 +29,7 @@ public class UserPermissionPk implements Serializable{
 	private User user;
 	
 	@ManyToOne
-	@JoinColumn(name="role_id")
-	private Permission permisison;
+	@JoinColumn(name="permission_id")
+	private Permission permission;
 	
 }
