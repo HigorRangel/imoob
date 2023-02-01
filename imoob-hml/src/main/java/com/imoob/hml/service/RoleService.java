@@ -9,7 +9,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.imoob.hml.model.Permission;
 import com.imoob.hml.model.Role;
 import com.imoob.hml.repository.RoleRepository;
 import com.imoob.hml.service.exceptions.DatabaseException;

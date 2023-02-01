@@ -89,7 +89,7 @@ public class TesteConfig implements CommandLineRunner{
 		userRepository.save(user1);
 
 		
-		UserPermission up1 = new UserPermission(user1, permission1, true, true, true, Instant.now());
+		UserPermission up1 = new UserPermission(user1, permission1, true, true, true, true, true, Instant.now());
 		userPermissionRepository.save(up1);
 		
 		

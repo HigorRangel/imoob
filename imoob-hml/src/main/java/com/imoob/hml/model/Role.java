@@ -19,6 +19,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
@@ -41,8 +42,8 @@ import lombok.ToString;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @EqualsAndHashCode
-public class Role implements Serializable{
-	
+public class Role implements Serializable {
+
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -60,19 +61,19 @@ public class Role implements Serializable{
 	@NonNull
 	@Column(length = 150)
 	private String description;
-	
-//	@OneToMany(mappedBy="id.role")
-//	private Set<UserRole> users = new HashSet<>();
-//	
+
 	@JsonIgnore
 	@Getter
 	@Setter
-	@ManyToMany(mappedBy = "roles", cascade=CascadeType.MERGE)
-			private List<User> users = new ArrayList<>();
+	@ManyToMany(mappedBy = "roles", cascade = CascadeType.MERGE)
+	private List<User> users = new ArrayList<>();
+
+
+	@ManyToOne
+	@JoinColumn(name = "realEstate_id")
+	private RealEstate realEstate;
 	
-	
-	
-//	@JsonIgnore
+	//	@JsonIgnore
 //	public Set<User> getUsers(){
 //		Set<User> set = new HashSet<User>();
 //		for(UserRole  x: users) {

@@ -16,7 +16,6 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Entity
@@ -27,47 +26,55 @@ import lombok.Setter;
 @Setter
 @Builder
 @EqualsAndHashCode
-public class UserPermission  implements Serializable{
-	
+public class UserPermission implements Serializable {
+
 	private static final long serialVersionUID = 1L;
 
 	@EmbeddedId
 	private UserPermissionPk id = new UserPermissionPk();
-	
+
 	@Convert(converter = BooleanConverter.class)
-	private Boolean create;
-	
+	private Boolean post;
+
 	@Convert(converter = BooleanConverter.class)
-	private Boolean edit;
-	
+	private Boolean put;
+
 	@Convert(converter = BooleanConverter.class)
 	private Boolean delete;
-	
+
+	@Convert(converter = BooleanConverter.class)
+	private Boolean patch;
+
+	@Convert(converter = BooleanConverter.class)
+	private Boolean get;
+
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
 	private Instant assignmentDate;
-	
-	public UserPermission(User user, Permission permission, Boolean create, Boolean edit, Boolean delete, Instant assignmentDate) {
+
+	public UserPermission(User user, Permission permission, Boolean post, Boolean put, Boolean delete, Boolean patch,
+			Boolean get, Instant assignmentDate) {
 		this.id.setUser(user);
 		this.id.setPermission(permission);
-		this.create = create;
-		this.edit = edit;
+		this.post = post;
+		this.put = put;
 		this.delete = delete;
+		this.patch = patch;
+		this.get = get;
 		this.assignmentDate = assignmentDate;
 	}
-	
-	
+
 	public Permission getPermission() {
 		return this.id.getPermission();
 	}
-	
+
 	public void setPermission(Permission permission) {
 		this.id.setPermission(permission);
 	}
-	
+
 	public User getUser() {
 		return this.id.getUser();
 	}
-	
+
 	public void setUser(User user) {
 		this.id.setUser(user);
 	}
