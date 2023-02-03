@@ -69,10 +69,10 @@ public class Role implements Serializable {
 	private List<User> users = new ArrayList<>();
 
 
-	@ManyToOne
-	@JoinColumn(name = "realEstate_id")
-	private RealEstate realEstate;
-	
+//	@ManyToOne
+//	@JoinColumn(name = "realEstate_id")
+//	private RealEstateOld realEstate;
+//	
 	//	@JsonIgnore
 //	public Set<User> getUsers(){
 //		Set<User> set = new HashSet<User>();

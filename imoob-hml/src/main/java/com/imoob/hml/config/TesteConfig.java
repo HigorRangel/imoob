@@ -12,11 +12,13 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.imoob.hml.model.Permission;
+import com.imoob.hml.model.RealEstate;
 import com.imoob.hml.model.Role;
 import com.imoob.hml.model.User;
 import com.imoob.hml.model.UserPermission;
 import com.imoob.hml.model.enums.UserStatus;
 import com.imoob.hml.repository.PermissionRepository;
+import com.imoob.hml.repository.RealEstateRepository;
 import com.imoob.hml.repository.RoleRepository;
 import com.imoob.hml.repository.UserPermissionRepository;
 import com.imoob.hml.repository.UserRepository;
@@ -37,6 +39,8 @@ public class TesteConfig implements CommandLineRunner{
 	private final PasswordEncoder passwordEncoder;
 
 	private final UserPermissionRepository userPermissionRepository;
+	
+	private final RealEstateRepository realEstateRepository;
 //	private final UserRoleRepository userRoleRepository;
 		
 	@Override
@@ -91,6 +95,11 @@ public class TesteConfig implements CommandLineRunner{
 		
 		UserPermission up1 = new UserPermission(user1, permission1, true, true, true, true, true, Instant.now());
 		userPermissionRepository.save(up1);
+		
+		
+//		RealEstate re1 = new RealEstate("20.293.671/0001-03", "Teste1", "Teste2", "A", Instant.now(), "higor@rangel.com", "teste");
+		
+//		realEstateRepository.save(re1);
 		
 		
 		

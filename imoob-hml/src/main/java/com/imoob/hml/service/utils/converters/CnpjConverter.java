@@ -11,7 +11,7 @@ public class CnpjConverter implements AttributeConverter<String, String> {
 
 	@Override
 	public String convertToDatabaseColumn(String attribute) {
-		return attribute.replace(".", "").replace("-", "");
+		return attribute.replace(".", "").replace("-", "").replace("/", "");
 	}
 
 	@Override
