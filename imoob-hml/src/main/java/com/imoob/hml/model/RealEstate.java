@@ -6,8 +6,9 @@ import java.time.Instant;
 import org.hibernate.validator.constraints.br.CNPJ;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.imoob.hml.model.enums.RealStateStatus;
+import com.imoob.hml.model.enums.RealEstateStatus;
 import com.imoob.hml.service.utils.converters.CnpjConverter;
+import com.imoob.hml.service.validators.RealEstateValue;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -78,7 +79,6 @@ public class RealEstate implements Serializable {
 	@Column(length = 100)
 	private String businessEmail;
 	
-	@NotNull
 	@Getter
 	@Setter
 	@Column(length = 100)
@@ -86,6 +86,7 @@ public class RealEstate implements Serializable {
 	
 	
 	@NotNull
+	@RealEstateValue
 	private Character status;
 
 	// @JsonIgnore
@@ -97,11 +98,11 @@ public class RealEstate implements Serializable {
 //		return set;
 //	}
 //	
-	public RealStateStatus getStatus() {
-		return RealStateStatus.valueOf(this.status);
+	public RealEstateStatus getStatus() {
+		return RealEstateStatus.valueOf(this.status);
 	}
 	
-	public void setStatus(RealStateStatus status) {
+	public void setStatus(RealEstateStatus status) {
 		this.status = status.getValue();
 	}
 //

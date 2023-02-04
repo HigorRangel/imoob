@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.github.fge.jsonpatch.JsonPatch;
 import com.imoob.hml.model.RealEstate;
+import com.imoob.hml.model.User;
 import com.imoob.hml.service.RealEstateService;
 
 import lombok.RequiredArgsConstructor;
@@ -40,23 +42,23 @@ public class RealEstateController {
 	}
 	
 	@PostMapping("/")
-	public ResponseEntity<RealEstate> insert(@RequestBody RealEstate permission){
-		permission = service.insert(permission);
+	public ResponseEntity<RealEstate> insert(@RequestBody RealEstate realEstate){
+		realEstate = service.insert(realEstate);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-				.buildAndExpand(permission.getId()).toUri();
+				.buildAndExpand(realEstate.getId()).toUri();
 		
-		return ResponseEntity.created(uri).body(permission); 
+		return ResponseEntity.created(uri).body(realEstate); 
 	}
-//	
-//	@PutMapping("/{id}")
-//	public ResponseEntity<RealEstate> update(@PathVariable Long id, @RequestBody RealEstate permission){
-//		permission = service.update(id, permission);
-//		return ResponseEntity.ok().body(permission);
-//	}
-//	
-//	@PatchMapping("/{id}")
-//	public ResponseEntity<RealEstate> patchUpdate(@PathVariable Long id, @RequestBody RealEstate permission){
-//		permission = service.patchUpdate(id, permission);
-//		return ResponseEntity.ok().body(permission);
-//	}
+	
+	@PutMapping("/{id}")
+	public ResponseEntity<RealEstate> update(@PathVariable Long id, @RequestBody RealEstate realEstate){
+		realEstate = service.update(id, realEstate);
+		return ResponseEntity.ok().body(realEstate);
+	}
+	
+	@PatchMapping(path = "/{id}", consumes = "application/json-patch+json")
+	public ResponseEntity<RealEstate> patchUpdate(@PathVariable Long id, @RequestBody JsonPatch patch){
+		RealEstate realEstate = service.patchUpdate(id, patch);
+			return ResponseEntity.ok(realEstate);
+	}
 }

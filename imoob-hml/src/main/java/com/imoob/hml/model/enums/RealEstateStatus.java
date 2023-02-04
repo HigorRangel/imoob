@@ -2,7 +2,7 @@ package com.imoob.hml.model.enums;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public enum RealStateStatus {
+public enum RealEstateStatus {
 	@JsonProperty("A")
 	ACTIVE('A'),
 
@@ -11,7 +11,7 @@ public enum RealStateStatus {
 
 	private Character value;
 
-	private RealStateStatus(char c) {
+	private RealEstateStatus(char c) {
 		this.value = c;
 	}
 
@@ -19,12 +19,12 @@ public enum RealStateStatus {
 		return value;
 	}
 	
-	public static RealStateStatus valueOf(Character status) {
-		for(RealStateStatus value : RealStateStatus.values()) {
+	public static RealEstateStatus valueOf(Character status) {
+		for(RealEstateStatus value : RealEstateStatus.values()) {
 			if(value.getValue() == status) {
 				return value;
 			}
 		}
-		throw new IllegalArgumentException("Invalid UserStatus code.");
+		throw new IllegalArgumentException("O status digitado não foi encontrado.");
 	}
 }

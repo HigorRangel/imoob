@@ -58,6 +58,7 @@ public class StandardError implements Serializable {
 			String errorMessage) {
 		this.timestamp = timestamp;
 		this.status = status;
+		this.error = error;
 		this.message = message;
 		this.path = path;
 		this.errorMessage = errorMessage;
@@ -69,6 +70,17 @@ public class StandardError implements Serializable {
 		this.message = message;
 		this.path = path;
 		this.errorMessage = (cause != null ? cause.getMessage() : null);
+	}
+	
+	public StandardError(Instant timestamp, Integer status, String error, String message, String path,
+			String errorMessage, String attributeName) {
+		this.timestamp = timestamp;
+		this.status = status;
+		this.error = error;
+		this.message = message;
+		this.path = path;
+		this.errorMessage = errorMessage;
+		this.attributeName = attributeName;
 	}
 
 }
