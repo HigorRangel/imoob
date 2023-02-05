@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
+import com.imoob.hml.config.JwtService;
 import com.imoob.hml.model.Permission;
 import com.imoob.hml.model.RealEstate;
 import com.imoob.hml.model.User;
@@ -32,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class RealEstateService {
 
 	private final RealEstateRepository repository;
+	
 	
 	private ObjectMapper objectMapper = JsonMapper.builder().findAndAddModules().build().setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
@@ -103,8 +105,11 @@ public class RealEstateService {
 	}
 	
 	private void validateWebsite(String url) {
-		if(!StringUtils.isNullOrEmpty(url) && !GeneralUtils.isValidURL(url)) {
-			throw new GeneralException("O campo website está vazio ou foi digitado incorretamente.");
+		if(StringUtils.isNullOrEmpty(url)) {
+			throw new GeneralException("O campo website não pode ficar vazio.");
+		}
+		if(!GeneralUtils.isValidURL(url)) {
+			throw new GeneralException("O website não é valido.");
 		}
 	}
 	

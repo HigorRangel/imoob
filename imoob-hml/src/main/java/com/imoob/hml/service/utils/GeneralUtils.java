@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class GeneralUtils {
-	public String convertObjectToJson(Object object) throws JsonProcessingException {
+	public static String convertObjectToJson(Object object) throws JsonProcessingException {
 		if (object == null) {
 			return null;
 		}

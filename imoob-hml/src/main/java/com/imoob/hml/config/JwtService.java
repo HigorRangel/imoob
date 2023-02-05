@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
@@ -14,11 +15,15 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class JwtService {
 
 	private static final String SECRET_KEY = "6D5971337436773979244226452948404D635166546A576E5A72347537782141";
+	private final UserDetailsService userDetailsService;
+	private final JwtService jwtService;
 
 	public String extractUsername(String token) {
 		return extractClaim(token, Claims::getSubject);
@@ -60,5 +65,12 @@ public class JwtService {
 	private Key getSignInKey() {
 		byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
 		return Keys.hmacShaKeyFor(keyBytes);
+	}
+
+	public UserDetails loadUserDetails(String authHeader) {
+		String jwtToken = authHeader.substring(7);
+		String userEmail = jwtService.extractUsername(jwtToken);
+		return userDetailsService.loadUserByUsername(userEmail);
+		
 	}
 }
