@@ -16,6 +16,9 @@ public class GeneralException extends RuntimeException{
 	
 	private String operation;
 	
+	private Object object;
+
+	
 	public GeneralException(String message) {
 		super(message);
 	}
@@ -25,8 +28,11 @@ public class GeneralException extends RuntimeException{
 		this.operation = operation;
 	}
 
-	public GeneralException(String className, Class<?> objClass) {
-		super("[" + objClass.getSimpleName() + "] " + className);
+	public GeneralException(String className, Object obj) {
+		super("[" + obj.getClass().getSimpleName() + "] " + className);
+
+		this.object = obj;
+		this.classObject = obj.getClass();
 	}
 	
 	public GeneralException(String className, Class<?> objClass, String operation) {
@@ -38,9 +44,10 @@ public class GeneralException extends RuntimeException{
 		super(message, e);
 	}
 	
-	public GeneralException(String message, Throwable e, Class<?> objClass) {
+	public GeneralException(String message, Throwable e, Object object) {
 		super(message, e);
-		this.classObject = objClass;
+		this.classObject = object.getClass();
+		this.object = object;
 	}
 
 }

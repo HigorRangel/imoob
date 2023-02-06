@@ -1,5 +1,6 @@
 package com.imoob.hml.controller.exceptions;
 
+import java.io.IOException;
 import java.time.Instant;
 
 import org.springframework.http.HttpStatus;
@@ -23,27 +24,17 @@ public class GeneralExceptionHandler {
 	private final SystemActivityService systemService;
 
 	@ExceptionHandler(GeneralException.class)
-	public ResponseEntity<StandardError> generalException(GeneralException e, HttpServletRequest request){
+	public ResponseEntity<StandardError> generalException(GeneralException e, HttpServletRequest request)
+			throws IOException {
 		String error = "Bad request.";
 		HttpStatus status = HttpStatus.BAD_REQUEST;
-		
-		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), 
-				(e.getCause() != null? e.getCause().getMessage() : null), request.getRequestURI(), 
-				(e.getClassObject() != null? e.getClassObject().getSimpleName() : null), 
-				(e.getAttributeName()));
-		
-		SystemActivity systemActivity = SystemActivity.builder()
-				.path(request.getRequestURI())
-				.operation(request.getMethod())
-				.description("Operação não concluída.")
-				.statusCode(status.value())
-				.errorMessage(e.getLocalizedMessage())
-				.stackTrace(e.getMessage())
-				.timestamp(Instant.now())
-				.build();
-				
-			systemService.insert(systemActivity);
-	
+
+		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(),
+				(e.getCause() != null ? e.getCause().getMessage() : null), request.getRequestURI(),
+				(e.getClassObject() != null ? e.getClassObject().getSimpleName() : null), (e.getAttributeName()));
+
+		systemService.insertError(error, null, status, request, e, e.getObject());
+
 		return ResponseEntity.status(status).body(err);
 	}
 }

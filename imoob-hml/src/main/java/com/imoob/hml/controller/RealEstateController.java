@@ -33,7 +33,7 @@ public class RealEstateController {
 	private final SystemActivityService systemService;
 	
 	private final String PATH = "/api/realestate";
-	
+		
 	@GetMapping("/")
 	public ResponseEntity<List<RealEstate>> findAll(Pageable pageable){
 		List<RealEstate> list = service.findAll(pageable);
@@ -50,12 +50,12 @@ public class RealEstateController {
 	@PostMapping("/")
 	public ResponseEntity<RealEstate> insert(@RequestBody RealEstate realEstate, HttpServletRequest request){
 		realEstate = service.insert(realEstate);
-		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}") 
 				.buildAndExpand(realEstate.getId()).toUri();
 		
 				
 			
-		systemService.insertOk(request.getRequestURI(), realEstate.getId(), request);
+		systemService.insertOk(request.getRequestURI(), realEstate.getId(), request, realEstate);
 		
 		return ResponseEntity.created(uri).body(realEstate); 
 	}

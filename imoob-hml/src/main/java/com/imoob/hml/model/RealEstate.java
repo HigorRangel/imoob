@@ -99,7 +99,7 @@ public class RealEstate implements Serializable {
 //	}
 //	
 	public RealEstateStatus getStatus() {
-		return RealEstateStatus.valueOf(this.status);
+		return this.status != null ? RealEstateStatus.valueOf(this.status) : null;
 	}
 	
 	public void setStatus(RealEstateStatus status) {

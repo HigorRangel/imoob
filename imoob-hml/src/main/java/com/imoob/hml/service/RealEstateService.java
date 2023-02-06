@@ -69,15 +69,17 @@ public class RealEstateService {
 	}
 	
 	public RealEstate patchUpdate(Long id, JsonPatch patch) {
+		
+		RealEstate userPatched = null;
 		try {
 			RealEstate currentRealEstate = repository.findById(id).get();
-			RealEstate userPatched = applyPatchToUser(patch, currentRealEstate);
+			 userPatched = applyPatchToUser(patch, currentRealEstate);
 
 
 			return repository.save(userPatched);
 		} catch (JsonPatchException | JsonProcessingException e) {
 			throw new GeneralException("Não foi possível atualizar o registro. Verifique as informações inseridas.", e,
-					User.class);
+					userPatched);
 		} catch (NoSuchElementException e) {
 			throw new ResourceNotFoundException(id, User.class);
 		}
@@ -91,25 +93,25 @@ public class RealEstateService {
 	
 	private void validateRealEstateFields(RealEstate realEstate) {
 		validateRealEstateNames(realEstate);
-		validateWebsite(realEstate.getWebsite());
+		validateWebsite(realEstate);
 	}
 	
 	
 	private void validateRealEstateNames(RealEstate realEstate) {
 		if(StringUtils.isNullOrEmpty(realEstate.getCorporateName())) {
-			throw new GeneralException("O campo Razão Social não pode ficar vazio.", RealEstate.class);
+			throw new GeneralException("O campo Razão Social não pode ficar vazio.", realEstate);
 		}
 		if(StringUtils.isNullOrEmpty(realEstate.getTradingName())){
-			throw new GeneralException("O campo Razão Social não pode ficar vazio.", RealEstate.class);
+			throw new GeneralException("O campo Razão Social não pode ficar vazio.", realEstate);
 		}
 	}
 	
-	private void validateWebsite(String url) {
-		if(StringUtils.isNullOrEmpty(url)) {
-			throw new GeneralException("O campo website não pode ficar vazio.");
+	private void validateWebsite(RealEstate realEstate) {
+		if(StringUtils.isNullOrEmpty(realEstate.getWebsite())) {
+			throw new GeneralException("O campo website não pode ficar vazio.", realEstate);
 		}
-		if(!GeneralUtils.isValidURL(url)) {
-			throw new GeneralException("O website não é valido.");
+		if(!GeneralUtils.isValidURL(realEstate.getWebsite())) {
+			throw new GeneralException("O website não é valido.", realEstate);
 		}
 	}
 	

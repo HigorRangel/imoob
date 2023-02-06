@@ -10,6 +10,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
+import com.imoob.hml.model.User;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -23,7 +25,6 @@ public class JwtService {
 
 	private static final String SECRET_KEY = "6D5971337436773979244226452948404D635166546A576E5A72347537782141";
 	private final UserDetailsService userDetailsService;
-	private final JwtService jwtService;
 
 	public String extractUsername(String token) {
 		return extractClaim(token, Claims::getSubject);
@@ -69,8 +70,18 @@ public class JwtService {
 
 	public UserDetails loadUserDetails(String authHeader) {
 		String jwtToken = authHeader.substring(7);
-		String userEmail = jwtService.extractUsername(jwtToken);
+		String userEmail = extractUsername(jwtToken);
 		return userDetailsService.loadUserByUsername(userEmail);
 		
 	}
+	
+	public User getUserByAuthorization(String authHeader) {
+		User user = null;
+		UserDetails userDetails = loadUserDetails(authHeader);
+		if(userDetails != null){
+			user = (User) userDetails;
+		}
+		return user;
+	}
+	
 }
