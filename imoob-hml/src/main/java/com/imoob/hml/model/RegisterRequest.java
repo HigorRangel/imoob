@@ -7,6 +7,10 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -38,6 +42,7 @@ public class RegisterRequest implements Serializable{
 	private LocalDate birthDate;
 		
 	private String password;
-	
+
+	private Long realEstate;
 	
 }

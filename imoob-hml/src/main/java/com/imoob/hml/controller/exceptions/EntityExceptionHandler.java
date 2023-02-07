@@ -15,19 +15,26 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.imoob.hml.model.exceptions.StandardError;
 import com.imoob.hml.model.exceptions.ValidationException;
+import com.imoob.hml.service.SystemActivityService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
+import lombok.RequiredArgsConstructor;
 
 @ControllerAdvice
+@RequiredArgsConstructor
 public class EntityExceptionHandler {
+	
+	private final SystemActivityService systemService;
+
 
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	public ResponseEntity<StandardError> messageNotReadable(HttpMessageNotReadableException e,
-			HttpServletRequest request) {
+			HttpServletRequest request) throws JsonProcessingException {
 		String error = "Há campo(s) não preenchido(s) corretamente.";
 		HttpStatus status = HttpStatus.BAD_REQUEST;
 
@@ -50,24 +57,30 @@ public class EntityExceptionHandler {
 
 		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(),
 				request.getRequestURI(), e.getCause().getMessage(), attributeName);
+		
+		systemService.insertError(error, status, request, e);
+
 
 		return ResponseEntity.status(status).body(err);
 	}
 
 	@ExceptionHandler(UsernameNotFoundException.class)
-	public ResponseEntity<StandardError> usernameNotFound(UsernameNotFoundException e, HttpServletRequest request) {
+	public ResponseEntity<StandardError> usernameNotFound(UsernameNotFoundException e, HttpServletRequest request) throws JsonProcessingException {
 		String error = "Usuário não encontrado.";
 		HttpStatus status = HttpStatus.NOT_FOUND;
 
 		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(),
 				e.getCause().getMessage(), request.getRequestURI());
 
+		systemService.insertError(error, status, request, e);
+
+		
 		return ResponseEntity.status(status).body(err);
 	}
 
 	@ExceptionHandler(ConstraintViolationException.class)
 	public ResponseEntity<ValidationException> hibernateValidation(ConstraintViolationException e,
-			HttpServletRequest request) {
+			HttpServletRequest request) throws JsonProcessingException {
 //		String error = "Campos com os dados incorretos. [" + e.getConstraintViolations();
 		HttpStatus status = HttpStatus.BAD_REQUEST;
 
@@ -82,17 +95,23 @@ public class EntityExceptionHandler {
 
 		ValidationException err = new ValidationException(Instant.now(), status.value(), request.getRequestURI(),
 				listErrors);
+		
+		systemService.insertError(null, status, request, e);
+
 
 		return ResponseEntity.status(status).body(err);
 	}
 
 	@ExceptionHandler(NullPointerException.class)
-	public ResponseEntity<StandardError> nullPointer(NullPointerException e, HttpServletRequest request) {
+	public ResponseEntity<StandardError> nullPointer(NullPointerException e, HttpServletRequest request) throws JsonProcessingException {
 		String error = "Valor nulo.";
 		HttpStatus status = HttpStatus.BAD_REQUEST;
 
 		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(),
 				(e.getCause() != null ? e.getCause().getMessage() : null), request.getRequestURI());
+		
+		systemService.insertError(error, status, request, e);
+
 
 		return ResponseEntity.status(status).body(err);
 	}

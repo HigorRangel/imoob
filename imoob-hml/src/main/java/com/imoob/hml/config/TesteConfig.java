@@ -87,8 +87,22 @@ public class TesteConfig implements CommandLineRunner{
 		
 		permission1 = permissionRepository.save(permission1);
 		
+		RealEstate realEstate1 = RealEstate.builder()
+				.cnpj("36.422.027/0001-10")
+				.corporateName("Imobiliária Teste LTDA")
+				.tradingName("Imobiliária Teste")
+				.created(Instant.now())
+				.website("www.imobiliaria.com.br")
+				.businessEmail("teste@imobiliariateste.com.br")
+				.status('A')
+				.build();
+		
+		
+		realEstate1 = realEstateRepository.save(realEstate1);
+		
 		user1.getRoles().add(role1);
 		user1.getRoles().add(role2);
+		user1.setRealEstate(realEstate1);
 		
 		userRepository.save(user1);
 

@@ -33,12 +33,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -153,6 +153,15 @@ public class User implements Serializable, UserDetails {
 
 	@OneToMany(mappedBy = "id.user", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
 	private Set<UserPermission> permissions = new HashSet<UserPermission>();
+	
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "realEstate_id")
+	@NotNull
+	@Getter
+	@Setter
+	private RealEstate realEstate;
+	
 
 	@JsonIgnore
 	@Override

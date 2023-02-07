@@ -32,8 +32,8 @@ public class GeneralExceptionHandler {
 		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(),
 				(e.getCause() != null ? e.getCause().getMessage() : null), request.getRequestURI(),
 				(e.getClassObject() != null ? e.getClassObject().getSimpleName() : null), (e.getAttributeName()));
-
-		systemService.insertError(error, null, status, request, e, e.getObject());
+		
+		systemService.insertError(error, status, request, e);
 
 		return ResponseEntity.status(status).body(err);
 	}

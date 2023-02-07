@@ -27,48 +27,57 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping(value = "/api/realestate")
 @RequiredArgsConstructor
 public class RealEstateController {
-	
+
 	private final RealEstateService service;
-	
+
 	private final SystemActivityService systemService;
-	
+
 	private final String PATH = "/api/realestate";
-		
+
 	@GetMapping("/")
-	public ResponseEntity<List<RealEstate>> findAll(Pageable pageable){
+	public ResponseEntity<List<RealEstate>> findAll(Pageable pageable, HttpServletRequest request) {
 		List<RealEstate> list = service.findAll(pageable);
-//		systemService.insertOk(this.PATH, null, "GET");
+
+		systemService.insertOk(request.getRequestURI(), null, request);
+
 		return ResponseEntity.ok().body(list);
 	}
-	
+
 	@GetMapping("/{id}")
-	public ResponseEntity<RealEstate> findById(@PathVariable Long id){
+	public ResponseEntity<RealEstate> findById(@PathVariable Long id, HttpServletRequest request) {
 		RealEstate permission = service.findById(id);
+
+		systemService.insertOk(request.getRequestURI(), null, request);
+
 		return ResponseEntity.ok().body(permission);
 	}
-	
+
 	@PostMapping("/")
-	public ResponseEntity<RealEstate> insert(@RequestBody RealEstate realEstate, HttpServletRequest request){
+	public ResponseEntity<RealEstate> insert(@RequestBody RealEstate realEstate, HttpServletRequest request) {
 		realEstate = service.insert(realEstate);
-		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}") 
-				.buildAndExpand(realEstate.getId()).toUri();
-		
-				
-			
-		systemService.insertOk(request.getRequestURI(), realEstate.getId(), request, realEstate);
-		
-		return ResponseEntity.created(uri).body(realEstate); 
+		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(realEstate.getId())
+				.toUri();
+
+		systemService.insertOk(request.getRequestURI(), realEstate.getId(), request);
+
+		return ResponseEntity.created(uri).body(realEstate);
 	}
-	
+
 	@PutMapping("/{id}")
-	public ResponseEntity<RealEstate> update(@PathVariable Long id, @RequestBody RealEstate realEstate){
+	public ResponseEntity<RealEstate> update(@PathVariable Long id, @RequestBody RealEstate realEstate, HttpServletRequest request) {
 		realEstate = service.update(id, realEstate);
+		
+		systemService.insertOk(request.getRequestURI(), realEstate.getId(), request);
+
 		return ResponseEntity.ok().body(realEstate);
 	}
-	
+
 	@PatchMapping(path = "/{id}", consumes = "application/json-patch+json")
-	public ResponseEntity<RealEstate> patchUpdate(@PathVariable Long id, @RequestBody JsonPatch patch){
+	public ResponseEntity<RealEstate> patchUpdate(@PathVariable Long id, @RequestBody JsonPatch patch, HttpServletRequest request) {
 		RealEstate realEstate = service.patchUpdate(id, patch);
-			return ResponseEntity.ok(realEstate);
+		
+		systemService.insertOk(request.getRequestURI(), realEstate.getId(), request);
+
+		return ResponseEntity.ok(realEstate);
 	}
 }

@@ -4,13 +4,13 @@ import java.time.Instant;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.imoob.hml.config.JwtService;
 import com.imoob.hml.model.AuthenticationRequest;
 import com.imoob.hml.model.AuthenticationResponse;
+import com.imoob.hml.model.RealEstate;
 import com.imoob.hml.model.RegisterRequest;
 import com.imoob.hml.model.User;
 import com.imoob.hml.model.enums.UserStatus;
@@ -29,7 +29,11 @@ public class AuthenticationService {
 	
 	private final UserService userService;
 	
+	private final RealEstateService realEstateService;
+	
 	public AuthenticationResponse register(RegisterRequest request) {
+		
+		RealEstate realEstate = realEstateService.findById(request.getRealEstate());
 
 		var user = User.builder()
 				.firstName(request.getFirstName())
@@ -45,6 +49,7 @@ public class AuthenticationService {
 				.created(Instant.now())
 				.numberAddress(request.getNumberAddress())
 				.complementAddress(request.getComplementAddress())
+				.realEstate(realEstate)
 				.build();
 		
 		user = userService.insert(user);

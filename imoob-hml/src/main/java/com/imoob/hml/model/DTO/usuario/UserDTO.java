@@ -3,10 +3,10 @@ package com.imoob.hml.model.DTO.usuario;
 import java.time.Instant;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.imoob.hml.model.User;
 import com.imoob.hml.model.enums.UserStatus;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
@@ -21,7 +21,12 @@ public class UserDTO {
 	private String cepAddress;
 	private String numberAddress;
 	private String complementAddress;
+	
+	@JsonFormat(pattern = "dd/MM/yyyy")
 	private LocalDate birthDate;
+	
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
+
 	private Instant created;
 	private Instant inactived;
 	private Instant lastUpdate;

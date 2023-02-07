@@ -12,4 +12,9 @@ import com.imoob.hml.model.RealEstate;
 @Repository
 public interface RealEstateRepository extends CrudRepository<RealEstate, Long> {
 	List<RealEstate> findAll(Pageable pageable);
+
+	RealEstate findByCnpj(String cnpj);
+
+	RealEstate findByCorporateName(String corporateName);
+
 }

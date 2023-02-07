@@ -69,6 +69,9 @@ public class JwtService {
 	}
 
 	public UserDetails loadUserDetails(String authHeader) {
+		if(authHeader == null) {
+			return null;
+		}
 		String jwtToken = authHeader.substring(7);
 		String userEmail = extractUsername(jwtToken);
 		return userDetailsService.loadUserByUsername(userEmail);

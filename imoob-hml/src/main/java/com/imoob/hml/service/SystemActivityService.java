@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import com.imoob.hml.model.User;
 import com.imoob.hml.repository.SystemActivityRepository;
 import com.imoob.hml.service.exceptions.GeneralException;
 import com.imoob.hml.service.utils.GeneralUtils;
+import com.imoob.hml.service.utils.StringUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -30,21 +33,14 @@ public class SystemActivityService {
 		return systemActivityRepository.save(systemActivity);
 	}
 
-	public void insertOk(String path, Long id, HttpServletRequest request, Object object) {
+	public void insertOk(String path, Long id, HttpServletRequest request) {
 
 		User user = jwtService.getUserByAuthorization(request.getHeader("Authorization"));
 		
-		String bodyJson = null;
-		try {
-			bodyJson = GeneralUtils.convertObjectToJson(object);
-		} catch (JsonProcessingException e) {
-			throw new GeneralException("Não foi possível insrir o registro. Verifique as informações inseridas.", e,
-					object);
-		}
 
 		SystemActivity systemActivity = SystemActivity.builder().path(path).objectId(id).operation(request.getMethod())
 				.description("Operação concluída.").statusCode(HttpStatus.OK.value()).timestamp(Instant.now())
-				.user(user).body(bodyJson).build();
+				.user(user).build();
 
 		this.insert(systemActivity);
 	}
@@ -60,8 +56,10 @@ public class SystemActivityService {
 		this.insert(systemActivity);
 	}
 
-	public void insertError(String error, Long objectId, HttpStatus status, HttpServletRequest request,
-			GeneralException e, Object body) throws JsonProcessingException {
+	public void insertError(String error, HttpStatus status, HttpServletRequest request,
+			Throwable e) throws JsonProcessingException {
+		
+		String strId = getPathId(request);
 		
 		User user = jwtService.getUserByAuthorization(request.getHeader("Authorization"));
 		
@@ -72,13 +70,27 @@ public class SystemActivityService {
 				.description("Operação não concluída.")
 				.statusCode(status.value())
 				.errorMessage(e.getLocalizedMessage())
+				.objectId((strId != null ? Long.valueOf(strId) : null))
 				.stackTrace(e.getMessage())
 				.timestamp(Instant.now())
 				.user(user)
-				.body(GeneralUtils.convertObjectToJson(body))
 				.build();
 		
 		this.insert(systemActivity);
 		
+	}
+
+	private String getPathId(HttpServletRequest request) {
+		String path = request.getRequestURI();
+		String id = null;
+		if (path != null) {
+		  List<String> parts = Arrays.asList(path.split("/"));
+		  if(parts.size() == 0) {
+			  return null;
+		  }
+		  parts = parts.stream().filter((param) -> StringUtils.isOnlyNumbers(param)).toList();
+		  id = (parts.size() != 0 ? parts.get(parts.size() - 1) : null);
+		}
+		return id;
 	}
 }

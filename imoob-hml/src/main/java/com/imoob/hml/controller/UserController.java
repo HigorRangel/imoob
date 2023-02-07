@@ -62,6 +62,29 @@ public class UserController {
 		return ResponseEntity.ok().body(obj);
 	}
 	
+	
+	@GetMapping(value = "/realestate/{id}")
+	//@PreAuthorize
+	public ResponseEntity<List<UserDTO>> findAllByRealEstate(@PathVariable Long id, Pageable pageable){
+//		try {
+//			service.findAllByRealEstate(pageable);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+		
+		
+		List<User> list = service.findAllByRealEstate(id, pageable);
+		
+		String remoteAddress = ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes())
+				.getRequest().getRemoteAddr();
+		
+		System.out.println(remoteAddress);
+		
+		List<UserDTO> listDTO = list.stream().map(user -> new UserDTO(user)).toList();
+		
+		return ResponseEntity.ok().body(listDTO);
+	}
+	
 	@PostMapping("/")
 	public ResponseEntity<User> insert(@RequestBody User obj){
 		obj = service.insert(obj);
