@@ -3,41 +3,38 @@ package com.imoob.hml.model;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.imoob.hml.service.utils.converters.BooleanConverter;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "tb_permission")
+@Table(name = "tb_grouping")
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
+@EqualsAndHashCode
 @Getter
 @Setter
 @Builder
-@EqualsAndHashCode
-public class Permission implements Serializable{
+public class Grouping implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -45,28 +42,20 @@ public class Permission implements Serializable{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@NonNull
+	@NotNull
 	@Column(length = 50)
 	private String name;
 	
-	@NonNull
-	@Column(length = 50)
-	private String displayName;
-	
-	@Column(length = 150)
+	@Column(length = 100)
 	private String description;
 	
-	@JsonIgnore
-	@OneToMany(mappedBy = "id.permission")
-	private Set<UserPermission> users = new HashSet<>();
+	@Convert(converter = BooleanConverter.class)
+	private Boolean enabled;
 	
-	@JsonIgnore
-	@ManyToMany(mappedBy = "permissions", cascade = CascadeType.MERGE)
-	private Set<Grouping> groupings = new HashSet<>();
 	
-	@JsonIgnore
-	private Set<User> getUsers(){
-		return users.stream().map(userPermission -> userPermission.getId().getUser()).collect(Collectors.toSet());
-	}
+	@ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+	@JoinTable(name = "tb_grouping_permission", joinColumns = @JoinColumn(name = "permission_id"), inverseJoinColumns = @JoinColumn(name = "grouping_id"))
+	Set<Permission> permissions = new HashSet<Permission>();
 	
+
 }
