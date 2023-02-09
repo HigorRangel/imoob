@@ -92,11 +92,14 @@ public class RealEstate implements Serializable {
 	private Character status;
 	
 	
-	@Transient
-	@JsonIgnore
-	@Getter
-	@Setter
-	private Boolean deserialized = false;
+
+    public RealEstate(String id) {
+        this.id = Long.parseLong(id);
+    }
+
+    public static RealEstate fromId(String id) {
+        return new RealEstate(id);
+    }
 
 	// @JsonIgnore
 //	public Set<User> getUsers(){
