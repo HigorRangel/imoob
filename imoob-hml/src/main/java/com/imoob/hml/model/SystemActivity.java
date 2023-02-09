@@ -48,11 +48,12 @@ public class SystemActivity {
 	@Column(length = 256)
 	private String errorMessage;
 	
+	@Column(length = 256)
+	private String userMessage;
 	
 	@Column(length = 512)
 	private String stackTrace;
 	
-	@JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
 	private Instant timestamp;
 		
 	@ManyToOne

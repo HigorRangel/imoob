@@ -70,6 +70,7 @@ public class SystemActivityService {
 				.description("Operação não concluída.")
 				.statusCode(status.value())
 				.errorMessage(e.getLocalizedMessage())
+				.userMessage(error)
 				.objectId((strId != null ? Long.valueOf(strId) : null))
 				.stackTrace(e.getMessage())
 				.timestamp(Instant.now())

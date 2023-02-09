@@ -14,6 +14,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
@@ -56,7 +57,7 @@ public class EntityExceptionHandler {
 		}
 
 		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(),
-				request.getRequestURI(), e.getCause().getMessage(), attributeName);
+				request.getRequestURI(), (e.getCause() != null ? e.getCause().getMessage() : null), attributeName);
 		
 		systemService.insertError(error, status, request, e);
 
@@ -116,6 +117,21 @@ public class EntityExceptionHandler {
 		return ResponseEntity.status(status).body(err);
 	}
 
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	public ResponseEntity<StandardError> usernameNotFound(MethodArgumentTypeMismatchException e, HttpServletRequest request) throws JsonProcessingException {
+		String error = "Há parâmetros da requisição sendo passados incorretamente.";
+		HttpStatus status = HttpStatus.NOT_FOUND;
+
+		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(),
+				e.getCause().getMessage(), request.getRequestURI());
+
+		systemService.insertError(error, status, request, e);
+
+		
+		return ResponseEntity.status(status).body(err);
+	}
+	
+	
 	/**
 	 * Get the attribute name
 	 * 

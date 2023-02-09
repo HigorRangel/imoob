@@ -38,8 +38,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserService {
 	private final UserRepository repository;
-	private ObjectMapper objectMapper = JsonMapper.builder().findAndAddModules().build()
-			.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+	private final ObjectMapper objectMapper;;
 
 	private final PasswordEncoder passwordEncoder;
 
