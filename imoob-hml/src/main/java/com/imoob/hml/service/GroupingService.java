@@ -58,8 +58,9 @@ public class GroupingService {
 	}
 
 	private void validateDuplicateGroupingName(String name) {
-		Grouping grouping = groupingRepository.findByName(name);
+		Grouping grouping = groupingRepository.findByNameIgnoreCase(name);
 		if(grouping != null) {
+			throw new GeneralException("Já existe um agrupamento com o nome '" + name + "'");
 		}
 	}
 

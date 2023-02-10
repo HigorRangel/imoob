@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.imoob.hml.model.RealEstate;
 import com.imoob.hml.repository.RealEstateRepository;
 import com.imoob.hml.service.exceptions.ResourceNotFoundException;
@@ -55,6 +56,8 @@ public class CustomRealEstateDeserializer extends StdDeserializer<RealEstate> {
 //		return realEstateRepository.findById(realEstateId).orElseThrow(() -> new ResourceNotFoundException(realEstateId, RealEstate.class));
 
 		ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+
 		RealEstate realEstate = mapper.readValue(p, RealEstate.class);
 	
 		String id = p.getValueAsString();
