@@ -16,6 +16,7 @@ import com.imoob.hml.repository.PermissionRepository;
 import com.imoob.hml.service.exceptions.DatabaseException;
 import com.imoob.hml.service.exceptions.GeneralException;
 import com.imoob.hml.service.exceptions.ResourceNotFoundException;
+import com.imoob.hml.service.utils.RequestUtils;
 import com.imoob.hml.service.utils.StringUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -39,8 +40,17 @@ public class PermissionService {
 		validateEmptyPermissionFields(permission);
 		validatePermissionName(permission.getName());
 		validateDuplicatePermissions(permission);
+		validateUri(permission.getPath());
 		permission.setName(permission.getName().toUpperCase());
+		permission.setEnabled(true);
 		return repository.save(permission);
+	}
+
+	private void validateUri(String path) {
+		if(!RequestUtils.isRouteValid(path)) {
+			throw new GeneralException("A rota informada não é válida.");
+		}
+		
 	}
 
 	public void delete(Long id) {
@@ -130,6 +140,12 @@ public class PermissionService {
 		if (StringUtils.isNullOrEmpty(permission.getDisplayName().trim())) {
 			throw new GeneralException("Campo Nome de Exibição não preenchido.");
 		}
+		if (StringUtils.isNullOrEmpty(permission.getPath().trim())) {
+			throw new GeneralException("Campo Rota não preenchido.");
+		}
+		if (permission.getOperation() == null) {
+			throw new GeneralException("Campo Operação não preenchido.");
+		}
 	}
 
 	/**
@@ -145,6 +161,9 @@ public class PermissionService {
 		if (repository.findByDisplayName(permission.getDisplayName().trim()) != null) {
 			throw new DatabaseException(
 					"Já existe um registro com o nome de exibição '" + permission.getDisplayName() + "'");
+		}
+		if (repository.findByRoute(permission.getPath().trim(), permission.getOperation().getName()) != null) {
+			throw new DatabaseException("Já existe um registro para a rota informada.");
 		}
 	}
 

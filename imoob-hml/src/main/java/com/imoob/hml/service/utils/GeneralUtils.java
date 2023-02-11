@@ -10,8 +10,9 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 
 @Service
 public class GeneralUtils {
-	
-	private static final ObjectMapper objectMapper = JsonMapper.builder().findAndAddModules().build().setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+	private static final ObjectMapper objectMapper = JsonMapper.builder().findAndAddModules().build()
+			.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
 	public static String convertObjectToJson(Object object) throws JsonProcessingException {
 		if (object == null) {
@@ -21,13 +22,14 @@ public class GeneralUtils {
 	}
 
 	public static Boolean isValidURL(String url) {
-		String[] schemes = { "http", "https"};
-		
+		String[] schemes = { "http", "https" };
+
 		if (!url.startsWith("http://") && !url.startsWith("https://")) {
-            url = "http://" + url;
-        }
-		
+			url = "http://" + url;
+		}
+
 		UrlValidator urlValidator = new UrlValidator(schemes, UrlValidator.ALLOW_LOCAL_URLS);
 		return urlValidator.isValid(url);
 	}
+
 }

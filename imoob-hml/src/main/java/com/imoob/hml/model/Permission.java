@@ -7,9 +7,12 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.imoob.hml.model.enums.ApiOperation;
+import com.imoob.hml.service.utils.converters.BooleanConverter;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,6 +22,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -32,7 +36,6 @@ import lombok.Setter;
 @Table(name = "tb_permission")
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Getter
 @Setter
 @Builder
@@ -45,16 +48,28 @@ public class Permission implements Serializable{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@NonNull
+	@NotNull
 	@Column(length = 50)
 	private String name;
 	
-	@NonNull
+	@NotNull
 	@Column(length = 50)
 	private String displayName;
 	
 	@Column(length = 150)
 	private String description;
+	
+	
+	@Convert(converter = BooleanConverter.class)
+	private Boolean enabled;
+	
+	@NotNull
+	@Column(length = 100)
+	private String path;
+	
+	@NotNull
+	@Column(length = 10)
+	private String operation;
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "id.permission")
@@ -69,4 +84,12 @@ public class Permission implements Serializable{
 		return users.stream().map(userPermission -> userPermission.getId().getUser()).collect(Collectors.toSet());
 	}
 	
+	
+	public ApiOperation getOperation() {
+		return ApiOperation.getByName(this.operation);
+	}
+	
+	public void setOperation(ApiOperation operation) {
+		this.operation = operation.getName();
+	}
 }

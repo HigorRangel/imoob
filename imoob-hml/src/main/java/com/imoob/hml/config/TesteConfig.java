@@ -80,6 +80,9 @@ public class TesteConfig implements CommandLineRunner{
 				.description("Cadastro de Usuário")
 				.displayName("Cadastro de Usuário")
 				.name("CADASTRO_USUARIO")
+				.path("/api/users/")
+				.operation("POST")
+				.enabled(true)
 				.build();
 		
 		role1 = roleRepository.save(role1);

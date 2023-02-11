@@ -1,7 +1,10 @@
 package com.imoob.hml.config;
 
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -12,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.imoob.hml.repository.UserRepository;
+import com.imoob.hml.service.utils.RequestUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -47,5 +51,11 @@ public class ApplicationConfig {
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
+	
+	@EventListener
+    public void handleContextRefresh(ContextRefreshedEvent event) {
+        ApplicationContext context = event.getApplicationContext();
+        RequestUtils.setApplicationContext(context);
+    }
 	
 }
