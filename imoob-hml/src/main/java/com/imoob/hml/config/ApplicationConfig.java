@@ -55,7 +55,7 @@ public class ApplicationConfig {
 	@EventListener
     public void handleContextRefresh(ContextRefreshedEvent event) {
         ApplicationContext context = event.getApplicationContext();
-        RequestUtils.setApplicationContext(context);
+//        RequestUtils.setApplicationContext(context);
     }
 	
 }

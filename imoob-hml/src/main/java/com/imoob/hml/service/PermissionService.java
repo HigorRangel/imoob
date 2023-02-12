@@ -47,9 +47,10 @@ public class PermissionService {
 	}
 
 	private void validateUri(String path) {
-		if(!RequestUtils.isRouteValid(path)) {
-			throw new GeneralException("A rota informada não é válida.");
-		}
+//		if(!RequestUtils.isRouteValid(path)) {
+//			throw new GeneralException("A rota informada não é válida.");
+//		}
+		//TODO Fazer o isRouteValid
 		
 	}
 

@@ -4,12 +4,14 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.imoob.hml.service.exceptions.GeneralException;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -24,7 +26,7 @@ import lombok.Setter;
 @Table(name = "tb_system_class")
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = "fields")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -48,7 +50,16 @@ public class SystemClass implements Serializable{
 	@Column(length = 100)
 	private String classFullName;
 	
-	@Column
+	@JsonIgnore
 	@OneToMany(mappedBy = "systemClass")
 	private Set<ClassField> fields = new HashSet<>();
+	
+	
+	public Class<?> getSystemClass(){
+		try {
+			return Class.forName(this.classFullName);
+		} catch (ClassNotFoundException e) {
+			throw new GeneralException("Classe não encontrada.", SystemClass.class);
+		}
+	}
 }

@@ -1,6 +1,7 @@
 package com.imoob.hml.model;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 
 import com.imoob.hml.service.exceptions.GeneralException;
 
@@ -27,7 +28,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = "systemClass")
 public class ClassField implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
@@ -54,7 +55,7 @@ public class ClassField implements Serializable{
 	
 	public Class<?> getFieldType(){
 		try {
-			return Class.forName(this.fieldName);
+			return Class.forName(this.fieldType);
 		}
 		catch (ClassNotFoundException e) {
 			throw new GeneralException("A classe não foi encontrada.", Field.class);
