@@ -20,15 +20,21 @@ import com.imoob.hml.model.ClassField;
 import com.imoob.hml.model.Grouping;
 import com.imoob.hml.model.Permission;
 import com.imoob.hml.model.RealEstate;
+import com.imoob.hml.model.RegisterRequest;
 import com.imoob.hml.model.Role;
+import com.imoob.hml.model.Route;
+import com.imoob.hml.model.SystemActivity;
 import com.imoob.hml.model.SystemClass;
 import com.imoob.hml.model.User;
 import com.imoob.hml.model.UserPermission;
+import com.imoob.hml.model.UserRole;
+import com.imoob.hml.model.enums.ApiOperation;
 import com.imoob.hml.model.enums.UserStatus;
 import com.imoob.hml.repository.ClassFieldRepository;
 import com.imoob.hml.repository.PermissionRepository;
 import com.imoob.hml.repository.RealEstateRepository;
 import com.imoob.hml.repository.RoleRepository;
+import com.imoob.hml.repository.RouteRepository;
 import com.imoob.hml.repository.SystemClassRepository;
 import com.imoob.hml.repository.UserPermissionRepository;
 import com.imoob.hml.repository.UserRepository;
@@ -55,6 +61,8 @@ public class TesteConfig implements CommandLineRunner {
 	private final SystemClassRepository systemClassRepository;
 
 	private final ClassFieldRepository classFieldRepository;
+	
+	private final RouteRepository routeRepository;
 //	private final UserRoleRepository userRoleRepository;
 
 	@Override
@@ -100,27 +108,102 @@ public class TesteConfig implements CommandLineRunner {
 		SystemClass classUser = setClass(User.class, "Usuário");
 		classUser = systemClassRepository.save(classUser);
 		setClassFields(classUser);
-
-		// *** AuthenticationRequest ***
-		SystemClass classAuthenticationRequest = setClass(AuthenticationRequest.class, "Requisição de Autenticação");
-		classAuthenticationRequest = systemClassRepository.save(classAuthenticationRequest);
-		setClassFields(classAuthenticationRequest);
+		setRoutes("/api/users/", classUser, ApiOperation.GET, ApiOperation.DELETE, ApiOperation.PATCH, ApiOperation.POST, ApiOperation.PUT);
+		setRoutes("/api/users/:id", classUser, ApiOperation.GET);
 
 		// *** AuthenticationResponse ***
 		SystemClass classAuthenticationResponse = setClass(AuthenticationResponse.class, "Requisição de Resposta");
 		classAuthenticationResponse = systemClassRepository.save(classAuthenticationResponse);
 		setClassFields(classAuthenticationResponse);
-		
+		setRoutes("/api/auth/register/", classAuthenticationResponse, ApiOperation.POST);
+		setRoutes("/api/auth/authenticate/", classAuthenticationResponse, ApiOperation.POST);
+
 		// *** ClassField ***
 		SystemClass clasClassField = setClass(ClassField.class, "Campos da Classe");
 		clasClassField = systemClassRepository.save(clasClassField);
 		setClassFields(clasClassField);
-		
+//		Route routeClassField = new Route(null, "/api/class/field/", clasClassField);
+//		routeClassField = routeRepository.save(routeClassField);
+
 		// *** Grouping ***
 		SystemClass classGrouping = setClass(Grouping.class, "Agrupamento");
 		classGrouping = systemClassRepository.save(classGrouping);
 		setClassFields(classGrouping);
+		setRoutes("/api/groupings/", classGrouping, ApiOperation.POST, ApiOperation.PATCH);
 
+
+		// *** Permission ***
+		SystemClass classPermission = setClass(Permission.class, "Permissões");
+		classPermission = systemClassRepository.save(classPermission);
+		setClassFields(classPermission);
+		setRoutes("/api/permissions/", classPermission, ApiOperation.GET, ApiOperation.DELETE, ApiOperation.PATCH, ApiOperation.POST, ApiOperation.PUT);
+		setRoutes("/api/permissions/:id", classPermission, ApiOperation.GET);
+
+		// *** RealEstate ***
+		SystemClass classRealEstate = setClass(RealEstate.class, "Imobiliária");
+		classRealEstate = systemClassRepository.save(classRealEstate);
+		setClassFields(classRealEstate);
+		setRoutes("/api/realestate/", classRealEstate, ApiOperation.GET, ApiOperation.DELETE, ApiOperation.PATCH, ApiOperation.POST, ApiOperation.PUT);
+		setRoutes("/api/realestate/:id", classRealEstate, ApiOperation.GET);
+
+//		// *** RegisterRequest ***
+//		SystemClass classRegisterRequest = setClass(RegisterRequest.class, "Requisição de Registro");
+//		classRegisterRequest = systemClassRepository.save(classRegisterRequest);
+//		setClassFields(classRegisterRequest);
+//		Route routeRegisterRequest = new Route(null, "/api/register-requests/", classRegisterRequest);
+//		routeRegisterRequest = routeRepository.save(routeRegisterRequest);
+
+		// *** Role ***
+		SystemClass classRole = setClass(Role.class, "Cargo");
+		classRole = systemClassRepository.save(classRole);
+		setClassFields(classRole);
+		setRoutes("/api/roles/", classRole, ApiOperation.GET, ApiOperation.DELETE, ApiOperation.PATCH, ApiOperation.POST, ApiOperation.PUT);
+		setRoutes("/api/roles/:id", classRole, ApiOperation.GET);
+
+		// *** Route ***
+		SystemClass classRoute = setClass(Route.class, "Rota");
+		classRoute = systemClassRepository.save(classRoute);
+		setClassFields(classRoute);
+//		setRoutes("/api/route/", classUser, ApiOperation.GET, ApiOperation.DELETE, ApiOperation.PATCH, ApiOperation.POST, ApiOperation.PUT);
+//		setRoutes("/api/route/:id", classUser, ApiOperation.GET);
+
+		// *** SystemActivity ***
+		SystemClass classSystemActivity = setClass(SystemActivity.class, "Atividade do Sistema");
+		classSystemActivity = systemClassRepository.save(classSystemActivity);
+		setClassFields(classSystemActivity);
+//		setRoutes("/api/systemactivity/", classUser, ApiOperation.GET, ApiOperation.DELETE, ApiOperation.PATCH, ApiOperation.POST, ApiOperation.PUT);
+//		setRoutes("/api/systemactivity/:id", classUser, ApiOperation.GET);
+
+		// *** SystemClass ***
+		SystemClass classSystemClass = setClass(SystemClass.class, "Classe do Sistema");
+		classSystemClass = systemClassRepository.save(classSystemClass);
+		setClassFields(classSystemClass);
+//		setRoutes("/api/systemclass/", classUser, ApiOperation.GET, ApiOperation.DELETE, ApiOperation.PATCH, ApiOperation.POST, ApiOperation.PUT);
+//		setRoutes("/api/systemclass/:id", classUser, ApiOperation.GET);
+
+		// *** UserPermission ***
+		SystemClass classUserPermission = setClass(UserPermission.class, "Permissão de Usuário");
+		classUserPermission = systemClassRepository.save(classUserPermission);
+		setClassFields(classUserPermission);
+//		setRoutes("/api/userpermissions/", classUser, ApiOperation.GET, ApiOperation.DELETE, ApiOperation.PATCH, ApiOperation.POST, ApiOperation.PUT);
+//		setRoutes("/api/userpermissions/:id", classUser, ApiOperation.GET);
+
+		// *** UserRole ***
+		SystemClass classUserRole = setClass(UserRole.class, "Cargo de Usuário");
+		classUserRole = systemClassRepository.save(classUserRole);
+		setClassFields(classUserRole);
+//		setRoutes("/api/userroles/", classUser, ApiOperation.GET, ApiOperation.DELETE, ApiOperation.PATCH, ApiOperation.POST, ApiOperation.PUT);
+//		setRoutes("/api/userroles/:id", classUser, ApiOperation.GET);
+
+		
+
+	}
+
+	private void setRoutes(String path,SystemClass systemClass, ApiOperation ... operations) {
+		for(ApiOperation operation : operations) {
+			Route routeUserGET = new Route(null, path, systemClass, operation);
+			routeUserGET = routeRepository.save(routeUserGET);
+		}
 	}
 
 	private SystemClass setClass(Class<?> clazz, String classNameTranslate) {

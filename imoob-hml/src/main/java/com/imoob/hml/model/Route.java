@@ -2,6 +2,8 @@ package com.imoob.hml.model;
 
 import java.io.Serializable;
 
+import com.imoob.hml.model.enums.ApiOperation;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -42,5 +44,26 @@ public class Route implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "systemClass_id")
 	private SystemClass systemClass;
+	
+	@NotNull
+	private String operation;
 
+	
+	public ApiOperation getOperation() {
+		return ApiOperation.getByName(operation);
+	}
+	
+	public void setOperation(ApiOperation operation) {
+		this.operation = operation.getName();
+	}
+
+	public Route(Long id, String route, SystemClass systemClass,  ApiOperation operation) {
+		super();
+		this.id = id;
+		this.route = route;
+		this.systemClass = systemClass;
+		this.operation = operation.getName();
+	}
+
+	
 }

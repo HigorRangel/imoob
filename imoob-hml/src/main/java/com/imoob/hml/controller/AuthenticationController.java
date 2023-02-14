@@ -20,7 +20,7 @@ public class AuthenticationController {
 
 	private final AuthenticationService service;
 
-	@PostMapping("/register")
+	@PostMapping("/register/")
 	public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
 		
 		AuthenticationResponse rr = service.register(request);
@@ -36,7 +36,7 @@ public class AuthenticationController {
 //		}
 	}
 
-	@PostMapping("/authenticate")
+	@PostMapping("/authenticate/")
 	public ResponseEntity<AuthenticationResponse> register(@RequestBody AuthenticationRequest request) {
 		return ResponseEntity.ok(service.authenticate(request));
 	}

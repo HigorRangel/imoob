@@ -13,12 +13,14 @@ import org.springframework.stereotype.Service;
 import com.imoob.hml.model.Permission;
 import com.imoob.hml.model.User;
 import com.imoob.hml.repository.PermissionRepository;
+import com.imoob.hml.repository.RouteRepository;
 import com.imoob.hml.service.exceptions.DatabaseException;
 import com.imoob.hml.service.exceptions.GeneralException;
 import com.imoob.hml.service.exceptions.ResourceNotFoundException;
 import com.imoob.hml.service.utils.RequestUtils;
 import com.imoob.hml.service.utils.StringUtils;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -26,6 +28,8 @@ import lombok.RequiredArgsConstructor;
 public class PermissionService {
 
 	private final PermissionRepository repository;
+	
+	private final RouteService routeService;
 
 	public List<Permission> findAll(Pageable pageable) {
 		return repository.findAll(pageable);
@@ -36,20 +40,20 @@ public class PermissionService {
 		return optPermission.orElseThrow(() -> new ResourceNotFoundException(id, Permission.class));
 	}
 
-	public Permission insert(Permission permission) {
+	public Permission insert(Permission permission, HttpServletRequest request) {
 		validateEmptyPermissionFields(permission);
 		validatePermissionName(permission.getName());
 		validateDuplicatePermissions(permission);
-		validateUri(permission.getPath());
+		validateUri(permission.getPath(), request);
 		permission.setName(permission.getName().toUpperCase());
 		permission.setEnabled(true);
 		return repository.save(permission);
 	}
 
-	private void validateUri(String path) {
-//		if(!RequestUtils.isRouteValid(path)) {
-//			throw new GeneralException("A rota informada não é válida.");
-//		}
+	private void validateUri(String path, HttpServletRequest request) {
+		if(!RequestUtils.isRouteValid(path, request.getMethod(), routeService)) {
+			throw new GeneralException("A rota informada não é válida.");
+		}
 		//TODO Fazer o isRouteValid
 		
 	}

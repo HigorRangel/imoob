@@ -18,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.imoob.hml.model.Permission;
 import com.imoob.hml.service.PermissionService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -40,8 +41,8 @@ public class PermissionController {
 	}
 	
 	@PostMapping("/")
-	public ResponseEntity<Permission> insert(@RequestBody Permission permission){
-		permission = service.insert(permission);
+	public ResponseEntity<Permission> insert(@RequestBody Permission permission, HttpServletRequest request){
+		permission = service.insert(permission, request);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
 				.buildAndExpand(permission.getId()).toUri();
 		
