@@ -10,6 +10,6 @@ import com.imoob.hml.model.enums.ApiOperation;
 public interface RouteRepository extends CrudRepository<Route, Long>{
 
 	@Query("select r from Route r where lower(r.route) = lower(:route) and r.operation = :operation")
-	Route findByRouteOperation(@Param("route") String route, @Param("operation") ApiOperation operation);
+	Route findByRouteOperation(@Param("route") String route, @Param("operation") String operation);
 
 }

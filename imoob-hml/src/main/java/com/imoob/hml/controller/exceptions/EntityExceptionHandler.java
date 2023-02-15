@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -124,6 +125,21 @@ public class EntityExceptionHandler {
 
 		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(),
 				e.getCause().getMessage(), request.getRequestURI());
+
+		systemService.insertError(error, status, request, e);
+
+		
+		return ResponseEntity.status(status).body(err);
+	}
+	
+	
+	@ExceptionHandler(InvalidDataAccessApiUsageException.class)
+	public ResponseEntity<StandardError> invalidDataAccessApiUsageException(InvalidDataAccessApiUsageException e, HttpServletRequest request) throws JsonProcessingException {
+		String error = "Alguns parâmetros ou argumentos não são suportados pela API.";
+		HttpStatus status = HttpStatus.BAD_REQUEST;
+
+		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(),
+				request.getRequestURI(), e.getCause().getMessage());
 
 		systemService.insertError(error, status, request, e);
 

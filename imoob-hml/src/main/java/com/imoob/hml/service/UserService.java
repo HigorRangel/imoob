@@ -6,6 +6,7 @@ import java.time.Period;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,15 +16,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
+import com.imoob.hml.model.Permission;
 import com.imoob.hml.model.User;
+import com.imoob.hml.model.UserPermission;
+import com.imoob.hml.model.DTO.usuario.UserPermissionAssignmentDTO;
 import com.imoob.hml.model.enums.UserStatus;
+import com.imoob.hml.repository.UserPermissionRepository;
 import com.imoob.hml.repository.UserRepository;
 import com.imoob.hml.service.exceptions.DatabaseException;
 import com.imoob.hml.service.exceptions.GeneralException;
@@ -38,6 +41,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserService {
 	private final UserRepository repository;
+	
+	private final PermissionService permissionService;
+	
+	private final UserPermissionRepository userPermissionRepository;
+	
 	private final ObjectMapper objectMapper;;
 
 	private final PasswordEncoder passwordEncoder;
@@ -322,6 +330,54 @@ public class UserService {
 						&& !userByEmail.get().getEmail().equals(oldUser.getEmail()))) {
 			throw new DatabaseException("Já existe um registro com os dados informados.");
 		}
+	}
+
+	public User assignPermission(UserPermissionAssignmentDTO obj) {
+		User user = findUserById(obj.getUser());
+		Permission permission = permissionService.findById(obj.getPermission());
+		
+		validateAssignPermission(user, permission);
+		
+		UserPermission up = new UserPermission(user, permission, Instant.now());
+		up = userPermissionRepository.save(up);
+		
+		Set<UserPermission> listPermissions = user.getAllPermissions();
+		listPermissions.add(up);
+		user.setPermissions(listPermissions);
+//		user.getPermissions().add(permission);
+		return user;
+		
+	}
+
+	/**
+	 * Validates if user already has the permission
+	 * @param user
+	 * @param permission
+	 */
+	private void validateAssignPermission(User user, Permission permission) {
+		if(user.getPermissions().contains(permission)) {
+			throw new GeneralException("A permissão solicitada já está atribuída ao usuário.");
+		}
+	}
+
+	public User unassignPermission(UserPermissionAssignmentDTO obj) {
+		User user = findUserById(obj.getUser());
+		Permission permission = permissionService.findById(obj.getPermission());
+		
+		
+		UserPermission up = userPermissionRepository.findByUserPermission(user.getId(), permission.getId());
+		
+		if(up == null) {
+			throw new GeneralException("A permissão não está atribuída à esse usuário.", User.class);
+		}
+		userPermissionRepository.delete(up);
+		
+		Set<UserPermission> listPermissions = user.getAllPermissions();
+		listPermissions.remove(up);
+		user.setPermissions(listPermissions);
+		
+		return user;
+		
 	}
 
 }

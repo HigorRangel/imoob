@@ -16,9 +16,9 @@ public class RequestUtils {
 
 	public static boolean isRouteValid(String route, ApiOperation operation, RouteService routeService) {
 		if(routeService.findByRouteOperation(route, operation) != null) {
-			return false;
+			return true;
 		}
-		return true;
+		return false;
 	}
 	
 	

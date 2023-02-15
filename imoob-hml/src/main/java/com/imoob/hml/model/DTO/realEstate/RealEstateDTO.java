@@ -1,4 +1,4 @@
-package com.imoob.hml.model.DTO.RealEstate;
+package com.imoob.hml.model.DTO.realEstate;
 
 import java.time.Instant;
 

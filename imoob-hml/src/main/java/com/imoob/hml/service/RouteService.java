@@ -15,6 +15,6 @@ public class RouteService {
 	private final RouteRepository routeRepository;
 	
 	public Route findByRouteOperation(String route, ApiOperation operation) {
-		return routeRepository.findByRouteOperation(route, operation);
+		return routeRepository.findByRouteOperation(route, operation.getName());
 	}
 }

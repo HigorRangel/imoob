@@ -78,15 +78,14 @@ public class TesteConfig implements CommandLineRunner {
 
 		Role role2 = Role.builder().description("Acesso Mínimo").displayName("Acesso Mínimo").name("ACESSO_MINIMO")
 				.build();
+		
+		
 
-		Permission permission1 = Permission.builder().description("Cadastro de Usuário")
-				.displayName("Cadastro de Usuário").name("CADASTRO_USUARIO").path("/api/users/").operation("POST")
-				.enabled(true).build();
+		
 
 		role1 = roleRepository.save(role1);
 		role2 = roleRepository.save(role2);
 
-		permission1 = permissionRepository.save(permission1);
 
 		RealEstate realEstate1 = RealEstate.builder().cnpj("36.422.027/0001-10").corporateName("Imobiliária Teste LTDA")
 				.tradingName("Imobiliária Teste").created(Instant.now()).website("www.imobiliaria.com.br")
@@ -100,51 +99,66 @@ public class TesteConfig implements CommandLineRunner {
 
 		userRepository.save(user1);
 
-		UserPermission up1 = new UserPermission(user1, permission1, true, true, true, true, true, Instant.now());
+		registerClassesAndRoutes();
+
+		
+		Permission permission1 = Permission.builder().description("Cadastro de Funções")
+				.displayName("Cadastro de Usuário").name("CADASTRO_FUNCAO").route(routeRepository.findByRouteOperation("/api/roles/", "GET"))
+				.enabled(true).build();
+		
+		permission1 = permissionRepository.save(permission1);
+		
+
+		UserPermission up1 = new UserPermission(user1, permission1, Instant.now());
 		userPermissionRepository.save(up1);
 
-		// Registro de todas as classes do sistema
-		// *** User ***
-		SystemClass classUser = setClass(User.class, "Usuário");
-		classUser = systemClassRepository.save(classUser);
-		setClassFields(classUser);
-		setRoutes("/api/users/", classUser, ApiOperation.GET, ApiOperation.DELETE, ApiOperation.PATCH, ApiOperation.POST, ApiOperation.PUT);
-		setRoutes("/api/users/:id", classUser, ApiOperation.GET);
 
-		// *** AuthenticationResponse ***
-		SystemClass classAuthenticationResponse = setClass(AuthenticationResponse.class, "Requisição de Resposta");
-		classAuthenticationResponse = systemClassRepository.save(classAuthenticationResponse);
-		setClassFields(classAuthenticationResponse);
-		setRoutes("/api/auth/register/", classAuthenticationResponse, ApiOperation.POST);
-		setRoutes("/api/auth/authenticate/", classAuthenticationResponse, ApiOperation.POST);
+		
+	}
 
-		// *** ClassField ***
-		SystemClass clasClassField = setClass(ClassField.class, "Campos da Classe");
-		clasClassField = systemClassRepository.save(clasClassField);
-		setClassFields(clasClassField);
+private void registerClassesAndRoutes() {
+	// Registro de todas as classes do sistema
+	// *** User ***
+	SystemClass classUser = setClass(User.class, "Usuário");
+	classUser = systemClassRepository.save(classUser);
+	setClassFields(classUser);
+	setRoutes("/api/users/", classUser, ApiOperation.GET, ApiOperation.DELETE, ApiOperation.PATCH, ApiOperation.POST, ApiOperation.PUT);
+	setRoutes("/api/users/:id", classUser, ApiOperation.GET);
+
+	// *** AuthenticationResponse ***
+	SystemClass classAuthenticationResponse = setClass(AuthenticationResponse.class, "Requisição de Resposta");
+	classAuthenticationResponse = systemClassRepository.save(classAuthenticationResponse);
+	setClassFields(classAuthenticationResponse);
+	setRoutes("/api/auth/register/", classAuthenticationResponse, ApiOperation.POST);
+	setRoutes("/api/auth/authenticate/", classAuthenticationResponse, ApiOperation.POST);
+
+	// *** ClassField ***
+	SystemClass clasClassField = setClass(ClassField.class, "Campos da Classe");
+	clasClassField = systemClassRepository.save(clasClassField);
+	setClassFields(clasClassField);
 //		Route routeClassField = new Route(null, "/api/class/field/", clasClassField);
 //		routeClassField = routeRepository.save(routeClassField);
 
-		// *** Grouping ***
-		SystemClass classGrouping = setClass(Grouping.class, "Agrupamento");
-		classGrouping = systemClassRepository.save(classGrouping);
-		setClassFields(classGrouping);
-		setRoutes("/api/groupings/", classGrouping, ApiOperation.POST, ApiOperation.PATCH);
+	// *** Grouping ***
+	SystemClass classGrouping = setClass(Grouping.class, "Agrupamento");
+	classGrouping = systemClassRepository.save(classGrouping);
+	setClassFields(classGrouping);
+	setRoutes("/api/groupings/", classGrouping, ApiOperation.POST, ApiOperation.PATCH);
 
 
-		// *** Permission ***
-		SystemClass classPermission = setClass(Permission.class, "Permissões");
-		classPermission = systemClassRepository.save(classPermission);
-		setClassFields(classPermission);
-		setRoutes("/api/permissions/", classPermission, ApiOperation.GET, ApiOperation.DELETE, ApiOperation.PATCH, ApiOperation.POST, ApiOperation.PUT);
-		setRoutes("/api/permissions/:id", classPermission, ApiOperation.GET);
+	// *** Permission ***
+	SystemClass classPermission = setClass(Permission.class, "Permissões");
+	classPermission = systemClassRepository.save(classPermission);
+	setClassFields(classPermission);
+	setRoutes("/api/permissions/", classPermission, ApiOperation.GET, ApiOperation.DELETE, ApiOperation.PATCH, ApiOperation.POST, ApiOperation.PUT);
+	setRoutes("/api/permissions/:id", classPermission, ApiOperation.GET);
 
-		// *** RealEstate ***
-		SystemClass classRealEstate = setClass(RealEstate.class, "Imobiliária");
-		classRealEstate = systemClassRepository.save(classRealEstate);
-		setClassFields(classRealEstate);
-		setRoutes("/api/realestate/", classRealEstate, ApiOperation.GET, ApiOperation.DELETE, ApiOperation.PATCH, ApiOperation.POST, ApiOperation.PUT);
-		setRoutes("/api/realestate/:id", classRealEstate, ApiOperation.GET);
+	// *** RealEstate ***
+	SystemClass classRealEstate = setClass(RealEstate.class, "Imobiliária");
+	classRealEstate = systemClassRepository.save(classRealEstate);
+	setClassFields(classRealEstate);
+	setRoutes("/api/realestate/", classRealEstate, ApiOperation.GET, ApiOperation.DELETE, ApiOperation.PATCH, ApiOperation.POST, ApiOperation.PUT);
+	setRoutes("/api/realestate/:id", classRealEstate, ApiOperation.GET);
 
 //		// *** RegisterRequest ***
 //		SystemClass classRegisterRequest = setClass(RegisterRequest.class, "Requisição de Registro");
@@ -153,51 +167,48 @@ public class TesteConfig implements CommandLineRunner {
 //		Route routeRegisterRequest = new Route(null, "/api/register-requests/", classRegisterRequest);
 //		routeRegisterRequest = routeRepository.save(routeRegisterRequest);
 
-		// *** Role ***
-		SystemClass classRole = setClass(Role.class, "Cargo");
-		classRole = systemClassRepository.save(classRole);
-		setClassFields(classRole);
-		setRoutes("/api/roles/", classRole, ApiOperation.GET, ApiOperation.DELETE, ApiOperation.PATCH, ApiOperation.POST, ApiOperation.PUT);
-		setRoutes("/api/roles/:id", classRole, ApiOperation.GET);
+	// *** Role ***
+	SystemClass classRole = setClass(Role.class, "Cargo");
+	classRole = systemClassRepository.save(classRole);
+	setClassFields(classRole);
+	setRoutes("/api/roles/", classRole, ApiOperation.GET, ApiOperation.DELETE, ApiOperation.PATCH, ApiOperation.POST, ApiOperation.PUT);
+	setRoutes("/api/roles/:id", classRole, ApiOperation.GET);
 
-		// *** Route ***
-		SystemClass classRoute = setClass(Route.class, "Rota");
-		classRoute = systemClassRepository.save(classRoute);
-		setClassFields(classRoute);
+	// *** Route ***
+	SystemClass classRoute = setClass(Route.class, "Rota");
+	classRoute = systemClassRepository.save(classRoute);
+	setClassFields(classRoute);
 //		setRoutes("/api/route/", classUser, ApiOperation.GET, ApiOperation.DELETE, ApiOperation.PATCH, ApiOperation.POST, ApiOperation.PUT);
 //		setRoutes("/api/route/:id", classUser, ApiOperation.GET);
 
-		// *** SystemActivity ***
-		SystemClass classSystemActivity = setClass(SystemActivity.class, "Atividade do Sistema");
-		classSystemActivity = systemClassRepository.save(classSystemActivity);
-		setClassFields(classSystemActivity);
+	// *** SystemActivity ***
+	SystemClass classSystemActivity = setClass(SystemActivity.class, "Atividade do Sistema");
+	classSystemActivity = systemClassRepository.save(classSystemActivity);
+	setClassFields(classSystemActivity);
 //		setRoutes("/api/systemactivity/", classUser, ApiOperation.GET, ApiOperation.DELETE, ApiOperation.PATCH, ApiOperation.POST, ApiOperation.PUT);
 //		setRoutes("/api/systemactivity/:id", classUser, ApiOperation.GET);
 
-		// *** SystemClass ***
-		SystemClass classSystemClass = setClass(SystemClass.class, "Classe do Sistema");
-		classSystemClass = systemClassRepository.save(classSystemClass);
-		setClassFields(classSystemClass);
+	// *** SystemClass ***
+	SystemClass classSystemClass = setClass(SystemClass.class, "Classe do Sistema");
+	classSystemClass = systemClassRepository.save(classSystemClass);
+	setClassFields(classSystemClass);
 //		setRoutes("/api/systemclass/", classUser, ApiOperation.GET, ApiOperation.DELETE, ApiOperation.PATCH, ApiOperation.POST, ApiOperation.PUT);
 //		setRoutes("/api/systemclass/:id", classUser, ApiOperation.GET);
 
-		// *** UserPermission ***
-		SystemClass classUserPermission = setClass(UserPermission.class, "Permissão de Usuário");
-		classUserPermission = systemClassRepository.save(classUserPermission);
-		setClassFields(classUserPermission);
+	// *** UserPermission ***
+	SystemClass classUserPermission = setClass(UserPermission.class, "Permissão de Usuário");
+	classUserPermission = systemClassRepository.save(classUserPermission);
+	setClassFields(classUserPermission);
 //		setRoutes("/api/userpermissions/", classUser, ApiOperation.GET, ApiOperation.DELETE, ApiOperation.PATCH, ApiOperation.POST, ApiOperation.PUT);
 //		setRoutes("/api/userpermissions/:id", classUser, ApiOperation.GET);
 
-		// *** UserRole ***
-		SystemClass classUserRole = setClass(UserRole.class, "Cargo de Usuário");
-		classUserRole = systemClassRepository.save(classUserRole);
-		setClassFields(classUserRole);
+	// *** UserRole ***
+	SystemClass classUserRole = setClass(UserRole.class, "Cargo de Usuário");
+	classUserRole = systemClassRepository.save(classUserRole);
+	setClassFields(classUserRole);
 //		setRoutes("/api/userroles/", classUser, ApiOperation.GET, ApiOperation.DELETE, ApiOperation.PATCH, ApiOperation.POST, ApiOperation.PUT);
 //		setRoutes("/api/userroles/:id", classUser, ApiOperation.GET);
-
-		
-
-	}
+}
 
 	private void setRoutes(String path,SystemClass systemClass, ApiOperation ... operations) {
 		for(ApiOperation operation : operations) {

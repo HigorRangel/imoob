@@ -33,33 +33,12 @@ public class UserPermission implements Serializable {
 	@EmbeddedId
 	private UserPermissionPk id = new UserPermissionPk();
 
-	@Convert(converter = BooleanConverter.class)
-	private Boolean post;
-
-	@Convert(converter = BooleanConverter.class)
-	private Boolean put;
-
-	@Convert(converter = BooleanConverter.class)
-	private Boolean delete;
-
-	@Convert(converter = BooleanConverter.class)
-	private Boolean patch;
-
-	@Convert(converter = BooleanConverter.class)
-	private Boolean get;
-
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
 	private Instant assignmentDate;
 
-	public UserPermission(User user, Permission permission, Boolean post, Boolean put, Boolean delete, Boolean patch,
-			Boolean get, Instant assignmentDate) {
+	public UserPermission(User user, Permission permission, Instant assignmentDate) {
 		this.id.setUser(user);
 		this.id.setPermission(permission);
-		this.post = post;
-		this.put = put;
-		this.delete = delete;
-		this.patch = patch;
-		this.get = get;
 		this.assignmentDate = assignmentDate;
 	}
 

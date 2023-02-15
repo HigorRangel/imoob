@@ -21,6 +21,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.imoob.hml.model.User;
 import com.imoob.hml.model.DTO.usuario.UserDTO;
+import com.imoob.hml.model.DTO.usuario.UserPermissionAssignmentDTO;
+import com.imoob.hml.model.DTO.usuario.UserPermissionDTO;
 import com.imoob.hml.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -115,5 +117,17 @@ public class UserController {
 	public ResponseEntity<User> patchUpdate(@PathVariable Long id, @RequestBody JsonPatch patch){
 			User user = service.patchUpdate(id, patch);
 			return ResponseEntity.ok(user);
+	}
+	
+	@PostMapping("/permission/")
+	public ResponseEntity<UserPermissionDTO> assignPermission(@RequestBody UserPermissionAssignmentDTO obj){
+		User userSaved = service.assignPermission(obj);
+		return ResponseEntity.ok().body(new UserPermissionDTO(userSaved));
+	}
+	
+	@DeleteMapping("/permission/")
+	public ResponseEntity<UserPermissionDTO> unassignPermission(@RequestBody UserPermissionAssignmentDTO obj){
+		User user = service.unassignPermission(obj);
+		return ResponseEntity.ok().body(new UserPermissionDTO(user));
 	}
 }

@@ -221,6 +221,11 @@ public class User implements Serializable, UserDetails {
 	public void setPermissions(Set<UserPermission> permissions) {
 		this.permissions = permissions;
 	}
+	
+	@JsonIgnore
+	public Set<UserPermission> getAllPermissions() {
+		return this.permissions;
+	}
 
 //	
 //	public Set<Role> getRoles() {

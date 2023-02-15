@@ -44,7 +44,8 @@ public class PermissionService {
 		validateEmptyPermissionFields(permission);
 		validatePermissionName(permission.getName());
 		validateDuplicatePermissions(permission);
-		validateUri(permission.getPath(), request);
+		//TODO Verificar como será feito, já que o path foi passado para a entidade
+//		validateUri(permission.getPath(), request);
 		permission.setName(permission.getName().toUpperCase());
 		permission.setEnabled(true);
 		return repository.save(permission);
@@ -109,9 +110,11 @@ public class PermissionService {
 		}
 	}
 
-	public boolean validatePermission(String requestURI, UserDetails userDetails) {
+	public boolean validatePermission(HttpServletRequest request, UserDetails userDetails) {
 		if (userDetails instanceof User) {
 			User user = (User) userDetails;
+			
+			
 		}
 
 		return false;
@@ -145,12 +148,13 @@ public class PermissionService {
 		if (StringUtils.isNullOrEmpty(permission.getDisplayName().trim())) {
 			throw new GeneralException("Campo Nome de Exibição não preenchido.");
 		}
-		if (StringUtils.isNullOrEmpty(permission.getPath().trim())) {
-			throw new GeneralException("Campo Rota não preenchido.");
-		}
-		if (permission.getOperation() == null) {
-			throw new GeneralException("Campo Operação não preenchido.");
-		}
+		//TODO Verificar se há a necessidade. Esses parâmetros foram passados para a entidade Route
+//		if (StringUtils.isNullOrEmpty(permission.getPath().trim())) {
+//			throw new GeneralException("Campo Rota não preenchido.");
+//		}
+//		if (permission.getOperation() == null) {
+//			throw new GeneralException("Campo Operação não preenchido.");
+//		}
 	}
 
 	/**
@@ -167,9 +171,11 @@ public class PermissionService {
 			throw new DatabaseException(
 					"Já existe um registro com o nome de exibição '" + permission.getDisplayName() + "'");
 		}
-		if (repository.findByRoute(permission.getPath().trim(), permission.getOperation().getName()) != null) {
-			throw new DatabaseException("Já existe um registro para a rota informada.");
-		}
+		
+		//TODO Verificar a real necessidade. Os atributos foram passados para a entidade route
+//		if (repository.findByRoute(permission.getPath().trim(), permission.getOperation().getName()) != null) {
+//			throw new DatabaseException("Já existe um registro para a rota informada.");
+//		}
 	}
 
 	/**

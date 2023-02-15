@@ -60,4 +60,5 @@ public class PermissionController {
 		permission = service.patchUpdate(id, permission);
 		return ResponseEntity.ok().body(permission);
 	}
+	
 }

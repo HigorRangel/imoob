@@ -64,12 +64,9 @@ public class Permission implements Serializable{
 	private Boolean enabled;
 	
 	@NotNull
-	@Column(length = 100)
-	private String path;
-	
-	@NotNull
-	@Column(length = 10)
-	private String operation;
+	@ManyToOne
+	@JoinColumn(name = "route_id")
+	private Route route;
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "id.permission")
@@ -85,11 +82,4 @@ public class Permission implements Serializable{
 	}
 	
 	
-	public ApiOperation getOperation() {
-		return ApiOperation.getByName(this.operation);
-	}
-	
-	public void setOperation(ApiOperation operation) {
-		this.operation = operation.getName();
-	}
 }

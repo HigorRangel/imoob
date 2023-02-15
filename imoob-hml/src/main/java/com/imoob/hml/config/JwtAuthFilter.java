@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.Instant;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -63,8 +64,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 					SecurityContextHolder.getContext().setAuthentication(authToken);
 				}
 
-				if (!permissionService.validatePermission(request.getRequestURI(), userDetails)) {
-
+				if (!permissionService.validatePermission(request, userDetails)) {
+//					throw new AccessDeniedException("O usuário não tem autorização para realizar essa operação.");
 				}
 			}
 			filterChain.doFilter(request, response);

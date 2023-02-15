@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.imoob.hml.model.RealEstate;
-import com.imoob.hml.model.DTO.RealEstate.RealEstateDTO;
+import com.imoob.hml.model.DTO.realEstate.RealEstateDTO;
 import com.imoob.hml.repository.RealEstateRepository;
 
 public class CustomRealEstateSerializer extends StdSerializer<RealEstate> {
