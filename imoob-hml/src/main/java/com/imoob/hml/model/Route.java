@@ -64,6 +64,10 @@ public class Route implements Serializable {
 		this.systemClass = systemClass;
 		this.operation = operation.getName();
 	}
+	
+	public Route(Long id) {
+	    this.id = id;
+	}
 
 	
 }

@@ -44,8 +44,7 @@ public class PermissionService {
 		validateEmptyPermissionFields(permission);
 		validatePermissionName(permission.getName());
 		validateDuplicatePermissions(permission);
-		//TODO Verificar como será feito, já que o path foi passado para a entidade
-//		validateUri(permission.getPath(), request);
+
 		permission.setName(permission.getName().toUpperCase());
 		permission.setEnabled(true);
 		return repository.save(permission);

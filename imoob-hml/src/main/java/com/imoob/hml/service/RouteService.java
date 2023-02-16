@@ -17,4 +17,8 @@ public class RouteService {
 	public Route findByRouteOperation(String route, ApiOperation operation) {
 		return routeRepository.findByRouteOperation(route, operation.getName());
 	}
+
+	public Route insert(Route route) {
+		return routeRepository.save(route);
+	}
 }

@@ -1,4 +1,4 @@
-package com.imoob.hml.service;
+package com.imoob.hml.service.serializers;
 
 import java.io.IOException;
 

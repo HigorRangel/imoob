@@ -18,6 +18,6 @@ public interface PermissionRepository extends CrudRepository<Permission, Long> {
 	
 	Permission findByDisplayName(String displayName);
 	
-	@Query("select p from Permission p where p.path = lower(:path) and p.operation = lower(:operation)")
+	@Query("select p from Permission p where p.route.route = lower(:path) and p.route.operation = lower(:operation)")
 	Permission findByRoute(@Param("path") String path, @Param("operation") String operation);
 }
