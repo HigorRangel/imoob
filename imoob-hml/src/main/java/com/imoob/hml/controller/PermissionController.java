@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.imoob.hml.model.Permission;
+import com.imoob.hml.model.DTO.permission.PermissionDTO;
 import com.imoob.hml.service.PermissionService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,12 +42,13 @@ public class PermissionController {
 	}
 	
 	@PostMapping("/")
-	public ResponseEntity<Permission> insert(@RequestBody Permission permission, HttpServletRequest request){
+	public ResponseEntity<PermissionDTO> insert(@RequestBody Permission permission, HttpServletRequest request){
 		permission = service.insert(permission, request);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
 				.buildAndExpand(permission.getId()).toUri();
 		
-		return ResponseEntity.created(uri).body(permission); 
+		PermissionDTO permissionDTO = new PermissionDTO(permission);
+		return ResponseEntity.created(uri).body(permissionDTO); 
 	}
 	
 	@PutMapping("/{id}")

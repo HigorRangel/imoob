@@ -1,6 +1,7 @@
 package com.imoob.hml.model.DTO.permission;
 
 import com.imoob.hml.model.Permission;
+import com.imoob.hml.model.DTO.route.RouteDTO;
 import com.imoob.hml.service.utils.converters.BooleanConverter;
 
 import jakarta.persistence.Convert;
@@ -19,6 +20,9 @@ public class PermissionDTO {
 	
 	@Convert(converter = BooleanConverter.class)
 	private Boolean enabled;
+	
+	private RouteDTO route;
+	
 
 	public PermissionDTO(Permission permission) {
 		super();
@@ -27,6 +31,7 @@ public class PermissionDTO {
 		this.displayName = permission.getDisplayName();
 		this.description = permission.getDescription();
 		this.enabled = permission.getEnabled();
+		this.route = new RouteDTO(permission.getRoute());
 	}
 	
 	

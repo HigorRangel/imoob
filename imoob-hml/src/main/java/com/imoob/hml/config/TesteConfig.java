@@ -102,8 +102,8 @@ public class TesteConfig implements CommandLineRunner {
 		registerClassesAndRoutes();
 
 		
-		Permission permission1 = Permission.builder().description("Cadastro de Funções")
-				.displayName("Cadastro de Usuário").name("CADASTRO_FUNCAO").route(routeRepository.findByRouteOperation("/api/roles/", "GET"))
+		Permission permission1 = Permission.builder().description("Cadastro de Permissões")
+				.displayName("Cadastro de Permissões").name("CADASTRO_PERMISSAO").route(routeRepository.findByRouteOperation("/api/permissions/", "POST"))
 				.enabled(true).build();
 		
 		permission1 = permissionRepository.save(permission1);

@@ -11,14 +11,12 @@ public class RouteDTO {
 
 	private Long id;
 	private String route;
-	private SystemClass systemClass;
 	private String operation;
 
 	public RouteDTO(Route route) {
 		super();
 		this.id = route.getId();
 		this.route = route.getRoute();
-		this.systemClass = route.getSystemClass();
 		this.operation = route.getOperation().getName();
 	}
 

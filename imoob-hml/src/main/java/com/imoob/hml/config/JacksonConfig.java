@@ -9,17 +9,21 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.imoob.hml.model.RealEstate;
+import com.imoob.hml.model.Route;
 import com.imoob.hml.repository.RealEstateRepository;
-import com.imoob.hml.service.CustomRealEstateDeserializer;
-import com.imoob.hml.service.CustomRealEstateSerializer;
+import com.imoob.hml.repository.RouteRepository;
+import com.imoob.hml.service.serializers.CustomRealEstateDeserializer;
+import com.imoob.hml.service.serializers.CustomRealEstateSerializer;
+import com.imoob.hml.service.serializers.CustomRouteDeserializer;
+import com.imoob.hml.service.serializers.CustomRouteSerializer;
 
 import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor
 public class JacksonConfig {
-    private final RealEstateRepository repository;
-	
+    private final RealEstateRepository realEstateRepository;
+    private final RouteRepository routeRepository;
 	
 	@Bean
     public ObjectMapper objectMapper() {
@@ -29,9 +33,12 @@ public class JacksonConfig {
         mapper.registerModule(new JavaTimeModule());
         
         SimpleModule module = new SimpleModule();
-        module.addSerializer(RealEstate.class, new CustomRealEstateSerializer(repository, mapper));
-        module.addDeserializer(RealEstate.class, new CustomRealEstateDeserializer(repository));
-
+        module.addSerializer(RealEstate.class, new CustomRealEstateSerializer(realEstateRepository, mapper));
+        module.addDeserializer(RealEstate.class, new CustomRealEstateDeserializer(realEstateRepository));
+        module.addSerializer(Route.class, new CustomRouteSerializer(routeRepository, mapper));
+        module.addDeserializer(Route.class, new CustomRouteDeserializer(routeRepository));
+        
+        
         mapper.registerModule(module);
         
         

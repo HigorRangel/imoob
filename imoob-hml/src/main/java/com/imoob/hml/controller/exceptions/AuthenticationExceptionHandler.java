@@ -4,6 +4,7 @@ import java.time.Instant;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -48,6 +49,23 @@ public class AuthenticationExceptionHandler {
 	@ExceptionHandler(DisabledException.class)
 	public ResponseEntity<StandardError> userDisabled(DisabledException e, HttpServletRequest request) throws JsonProcessingException {
 		String error = "O usuário está desabilitado.";
+		HttpStatus status = HttpStatus.FORBIDDEN;
+		StandardError err = StandardError.builder()
+				.timestamp(Instant.now())
+				.status(status.value())
+				.message(e.getMessage())
+				.error(error)
+				.path(request.getRequestURI()).build();
+		
+		systemService.insertError(error, status, request, e);
+
+	
+		return ResponseEntity.status(status).body(err);
+	}
+	
+	@ExceptionHandler(AccessDeniedException.class)
+	public ResponseEntity<StandardError> accessDenied(AccessDeniedException e, HttpServletRequest request) throws JsonProcessingException {
+		String error = "O usuário não tem autorização para realizar essa operação.";
 		HttpStatus status = HttpStatus.FORBIDDEN;
 		StandardError err = StandardError.builder()
 				.timestamp(Instant.now())

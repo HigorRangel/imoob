@@ -3,6 +3,7 @@ package com.imoob.hml.service;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 import com.imoob.hml.model.Permission;
 import com.imoob.hml.model.User;
 import com.imoob.hml.repository.PermissionRepository;
-import com.imoob.hml.repository.RouteRepository;
 import com.imoob.hml.service.exceptions.DatabaseException;
 import com.imoob.hml.service.exceptions.GeneralException;
 import com.imoob.hml.service.exceptions.ResourceNotFoundException;
@@ -113,10 +113,36 @@ public class PermissionService {
 		if (userDetails instanceof User) {
 			User user = (User) userDetails;
 			
+			Set<Permission> permissions = user.getPermissions();
+			
+
+			Permission permissionRoute = repository.findByRoute(routeService.findByRouteOperation(request.getRequestURI(), request.getMethod()));
+			
+			System.out.println("URI: " + request.getRequestURI() + " || " + request.getMethod());
+			
+			if(!permissions.isEmpty() && permissionRoute != null) {
+				try {
+					boolean returnValue = permissions.stream().anyMatch(t -> t.equals(permissionRoute));
+					return returnValue;
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+//				return returnValue; 
+			}
 			
 		}
 
 		return false;
+	}
+
+	public Permission findByRoute(String requestURI, String method) {
+		try {
+			return repository.findByRoute(requestURI, method);
+		}
+		catch (EmptyResultDataAccessException e) {
+			throw new ResourceNotFoundException("", Permission.class);
+		}
 	}
 
 	/**
@@ -172,9 +198,9 @@ public class PermissionService {
 		}
 		
 		//TODO Verificar a real necessidade. Os atributos foram passados para a entidade route
-//		if (repository.findByRoute(permission.getPath().trim(), permission.getOperation().getName()) != null) {
-//			throw new DatabaseException("Já existe um registro para a rota informada.");
-//		}
+		if (repository.findByRoute(permission.getRoute()) != null) {
+			throw new DatabaseException("Já existe um registro para a rota informada.");
+		}
 	}
 
 	/**

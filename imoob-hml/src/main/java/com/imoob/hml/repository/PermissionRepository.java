@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.imoob.hml.model.Permission;
+import com.imoob.hml.model.Route;
 
 @Repository
 public interface PermissionRepository extends CrudRepository<Permission, Long> {
@@ -20,4 +21,7 @@ public interface PermissionRepository extends CrudRepository<Permission, Long> {
 	
 	@Query("select p from Permission p where p.route.route = lower(:path) and p.route.operation = lower(:operation)")
 	Permission findByRoute(@Param("path") String path, @Param("operation") String operation);
+
+	@Query("select p from Permission p where p.route = :route")
+	Permission findByRoute(Route route);
 }

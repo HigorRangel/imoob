@@ -65,7 +65,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 				}
 
 				if (!permissionService.validatePermission(request, userDetails)) {
-//					throw new AccessDeniedException("O usuário não tem autorização para realizar essa operação.");
+					throw new AccessDeniedException("O usuário não tem autorização para realizar essa operação.");
+
 				}
 			}
 			filterChain.doFilter(request, response);
@@ -81,11 +82,28 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
 			response.setContentType("application/json");
 			response.getWriter().write(GeneralUtils.convertObjectToJson(err));
+		} catch (AccessDeniedException e) {
+			accessDeniedException(request, response, e);
 		} catch (Exception e) {
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 
 	}
+
+	private void accessDeniedException(HttpServletRequest request, HttpServletResponse response, AccessDeniedException e)
+			throws JsonProcessingException, IOException {
+
+		response.setStatus(HttpStatus.FORBIDDEN.value());
+		String error = "O usuário não tem autorização para realizar essa operação.";
+
+		StandardError err = new StandardError(Instant.now(), HttpStatus.FORBIDDEN.value(), error, e.getMessage(),
+				e.getCause(), request.getRequestURI());
+
+		response.setContentType("application/json");
+		response.getWriter().write(GeneralUtils.convertObjectToJson(err));
+
+	}
+
 //
 //	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
 //			@NonNull FilterChain filterChain) throws ServletException, IOException {
