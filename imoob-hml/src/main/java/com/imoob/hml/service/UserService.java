@@ -66,6 +66,9 @@ public class UserService {
 	public User insert(User obj) {
 		validateEmptyFields(obj);
 		validateDuplicatedUser(obj);
+		obj.setStatus(UserStatus.PENDING);
+		obj.setCreated(Instant.now());
+		obj.setLastUpdate(Instant.now());
 		return repository.save(obj);
 	}
 
@@ -292,9 +295,6 @@ public class UserService {
 		}
 		if (StringUtils.isNullOrEmpty(user.getEmail())) {
 			throw new GeneralException("Campo Email não preenchido.");
-		}
-		if (user.getStatus() == null) {
-			user.setStatus(UserStatus.ACTIVE);
 		}
 		if (StringUtils.isNullOrEmpty(user.getEmail())) {
 			throw new GeneralException("Campo Email não preenchido.");

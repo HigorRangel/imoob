@@ -25,8 +25,6 @@ public class RealEstateDTO {
     private String corporateName;
     
     
-    private String cnpj;
-
 	@NotNull
 	private String tradingName;
 
@@ -36,13 +34,6 @@ public class RealEstateDTO {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
 	private Instant created;
 
-	@NotNull
-	@Email
-	@Column(length = 100)
-	private String businessEmail;
-	
-	@Column(length = 100)
-	private String website;
 	
 	
 	@NotNull
@@ -54,11 +45,9 @@ public class RealEstateDTO {
     public RealEstateDTO(RealEstate realEstate) {
         this.id = realEstate.getId();
         this.corporateName = realEstate.getCorporateName();
-        this.cnpj = realEstate.getCnpj();
         this.tradingName = realEstate.getTradingName();
         this.created = realEstate.getCreated();
-        this.businessEmail = realEstate.getBusinessEmail();
-        this.status = realEstate.getStatus().getValue();
+        this.status =  realEstate.getStatus() != null ? realEstate.getStatus().getValue() : null;
         
         
         

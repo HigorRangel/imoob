@@ -56,8 +56,9 @@ public class CustomRealEstateSerializer extends StdSerializer<RealEstate> {
 //		    objectMapper.writeValue(jsonGenerator, realEstate2);
 //		    this.objectMapper.configure(SerializationFeature.FAIL_ON_SELF_REFERENCES, true);
 
+	    RealEstate realEstateAux = realEstateRepository.findById(realEstate.getId()).orElse(null);
 
-		RealEstateDTO realEstateDTO = new RealEstateDTO(realEstate);
+		RealEstateDTO realEstateDTO = new RealEstateDTO(realEstateAux);
         objectMapper.writeValue(jsonGenerator, realEstateDTO);
 
 

@@ -60,12 +60,11 @@ public class CustomRealEstateDeserializer extends StdDeserializer<RealEstate> {
 
 		RealEstate realEstate = mapper.readValue(p, RealEstate.class);
 	
-		String id = p.getValueAsString();
-	    if (id == null || id.equals("0")) {
+		Long id = realEstate.getId();
+	    if (id == null || id == 0) {
 	        return realEstate;
 	    }
-	    Long realEstateId = Long.parseLong(id);
-	    return realEstateRepository.findById(realEstateId).orElseThrow(() -> new ResourceNotFoundException(realEstateId, RealEstate.class));
+	    return realEstateRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id, RealEstate.class));
 		
 		
 		

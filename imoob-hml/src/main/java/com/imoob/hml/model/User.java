@@ -206,7 +206,7 @@ public class User implements Serializable, UserDetails {
 	}
 
 	public UserStatus getStatus() {
-		return UserStatus.valueOf(status);
+		return (this.status != null) ? UserStatus.valueOf(this.status) : null;
 	}
 
 	public void setStatus(UserStatus status) {

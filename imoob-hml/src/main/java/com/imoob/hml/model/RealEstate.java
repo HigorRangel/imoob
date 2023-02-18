@@ -96,6 +96,10 @@ public class RealEstate implements Serializable {
     public RealEstate(String id) {
         this.id = Long.parseLong(id);
     }
+    
+    public RealEstate(Long id) {
+        this.id = id;
+    }
 
     public static RealEstate fromId(String id) {
         return new RealEstate(id);
