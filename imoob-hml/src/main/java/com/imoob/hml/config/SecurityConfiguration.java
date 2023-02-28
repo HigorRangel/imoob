@@ -8,7 +8,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -31,6 +30,7 @@ public class SecurityConfiguration {
 	private final  AuthenticationProvider authenticationProvider;
 	private final JwtAuthFilter jwtAuthFilter;
 
+	
 	@Bean
 	public SecurityFilterChain setFilterChain(HttpSecurity http) throws Exception {
 //		http
@@ -68,7 +68,10 @@ public class SecurityConfiguration {
 		.authenticationProvider(authenticationProvider)
 		.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
 		.exceptionHandling()
-		.accessDeniedHandler(accessDeniedHandler());
+		.accessDeniedHandler(accessDeniedHandler())
+        ;
+        
+
 		
 
 		return http.build();
@@ -90,5 +93,5 @@ public class SecurityConfiguration {
     public AuthenticationFailureHandler authenticationFailureHandler() {
         return new CustomAuthenticationFailureHandler();
     }
-
+    
 }

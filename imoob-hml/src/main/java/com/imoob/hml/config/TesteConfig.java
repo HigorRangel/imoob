@@ -8,19 +8,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.reflections.Reflections;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.imoob.hml.model.AuthenticationRequest;
 import com.imoob.hml.model.AuthenticationResponse;
 import com.imoob.hml.model.ClassField;
+import com.imoob.hml.model.Client;
 import com.imoob.hml.model.Grouping;
 import com.imoob.hml.model.Permission;
 import com.imoob.hml.model.RealEstate;
-import com.imoob.hml.model.RegisterRequest;
 import com.imoob.hml.model.Role;
 import com.imoob.hml.model.Route;
 import com.imoob.hml.model.SystemActivity;
@@ -28,7 +29,9 @@ import com.imoob.hml.model.SystemClass;
 import com.imoob.hml.model.User;
 import com.imoob.hml.model.UserPermission;
 import com.imoob.hml.model.UserRole;
+import com.imoob.hml.model.UserType;
 import com.imoob.hml.model.enums.ApiOperation;
+import com.imoob.hml.model.enums.TypeUser;
 import com.imoob.hml.model.enums.UserStatus;
 import com.imoob.hml.repository.ClassFieldRepository;
 import com.imoob.hml.repository.PermissionRepository;
@@ -38,7 +41,9 @@ import com.imoob.hml.repository.RouteRepository;
 import com.imoob.hml.repository.SystemClassRepository;
 import com.imoob.hml.repository.UserPermissionRepository;
 import com.imoob.hml.repository.UserRepository;
+import com.imoob.hml.repository.UserTypeRepository;
 
+import jakarta.persistence.Entity;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -47,6 +52,8 @@ import lombok.RequiredArgsConstructor;
 public class TesteConfig implements CommandLineRunner {
 
 	private final UserRepository userRepository;
+	
+	private final UserTypeRepository userTypeRepository;
 
 	private final RoleRepository roleRepository;
 
@@ -67,11 +74,11 @@ public class TesteConfig implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		User user1 = User.builder().birthDate(LocalDate.parse("10/09/2000", DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+		Client client1 = Client.builder().birthDate(LocalDate.parse("10/09/2000", DateTimeFormatter.ofPattern("dd/MM/yyyy")))
 				.cepAddress("13473758").cpf("07553675105").created(Instant.now()).email("rood_alves@hotmail.com")
 				.firstName("Rodrigo").middleNames("Alves").lastName("Ribeiro").lastUpdate(Instant.now())
 				.numberAddress("1008").password(passwordEncoder.encode("45945261")).status(UserStatus.ACTIVE)
-				.roles(new ArrayList<>()).permissions(new HashSet<UserPermission>()).build();
+				.roles(new ArrayList<>()).permissions(new HashSet<UserPermission>()).userTypes(new ArrayList<>()).build();
 
 		Role role1 = Role.builder().description("Acesso de Administrador").displayName("Acesso Administrador")
 				.name("ACESSO_ADMINISTRADOR").build();
@@ -93,28 +100,54 @@ public class TesteConfig implements CommandLineRunner {
 
 		realEstate1 = realEstateRepository.save(realEstate1);
 
-		user1.getRoles().add(role1);
-		user1.getRoles().add(role2);
-		user1.setRealEstate(realEstate1);
+		client1.getRoles().add(role1);
+		client1.getRoles().add(role2);
+		client1.setRealEstate(realEstate1);
+		UserType userType1 = new UserType(client1, TypeUser.FUNCIONARIO);
+		
 
-		userRepository.save(user1);
-
+		
 		registerClassesAndRoutes();
+
 
 		
 		Permission permission1 = Permission.builder().description("Cadastro de Permissões")
 				.displayName("Cadastro de Permissões").name("CADASTRO_PERMISSAO").route(routeRepository.findByRouteOperation("/api/permissions/", "POST"))
-				.enabled(true).build();
+				.enabled(true).users(new HashSet<UserPermission>()).build();
+		
+		UserPermission up1 = new UserPermission(client1, permission1, Instant.now());
+		
+		client1.getPermissions().add(up1);
+		permission1.getUsers().add(up1);
 		
 		permission1 = permissionRepository.save(permission1);
+		client1 = userRepository.save(client1);
+		userType1 = userTypeRepository.save(userType1);
+		
+		userPermissionRepository.save(up1);
+		
 		
 
-		UserPermission up1 = new UserPermission(user1, permission1, Instant.now());
-		userPermissionRepository.save(up1);
+		
+		
+		
+
+		
+		getClasses();
 
 
 		
 	}
+
+private void getClasses() {
+	String packageName = "com.imoob.hml.model";
+	Reflections reflections = new Reflections(packageName);
+	Set<Class<?>> classes = reflections.getTypesAnnotatedWith(Entity.class);
+	
+	classes.forEach(x ->{
+		System.out.println(x.getName());
+	});
+}
 
 private void registerClassesAndRoutes() {
 	// Registro de todas as classes do sistema

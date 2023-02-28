@@ -10,10 +10,9 @@ import org.springframework.stereotype.Service;
 import com.imoob.hml.config.JwtService;
 import com.imoob.hml.model.AuthenticationRequest;
 import com.imoob.hml.model.AuthenticationResponse;
+import com.imoob.hml.model.Client;
 import com.imoob.hml.model.RealEstate;
 import com.imoob.hml.model.RegisterRequest;
-import com.imoob.hml.model.User;
-import com.imoob.hml.model.enums.UserStatus;
 import com.imoob.hml.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -35,12 +34,11 @@ public class AuthenticationService {
 		
 		RealEstate realEstate = realEstateService.findById(request.getRealEstate());
 
-		var user = User.builder()
+		var user = Client.builder()
 				.firstName(request.getFirstName())
 				.middleNames(request.getMiddleNames())
 				.lastName(request.getLastName())
 				.email(request.getEmail())
-				.status(UserStatus.ACTIVE)
 				.cpf(request.getCpf()) 
 				.password(passwordEncoder.encode(request.getPassword()))
 				.birthDate(request.getBirthDate())

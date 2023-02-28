@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.imoob.hml.model.Permission;
+import com.imoob.hml.model.Route;
 import com.imoob.hml.model.User;
 import com.imoob.hml.repository.PermissionRepository;
 import com.imoob.hml.service.exceptions.DatabaseException;
@@ -111,25 +112,34 @@ public class PermissionService {
 
 	public boolean validatePermission(HttpServletRequest request, UserDetails userDetails) {
 		if (userDetails instanceof User) {
-			User user = (User) userDetails;
+			User user = ((User) userDetails);
 			
-			Set<Permission> permissions = user.getPermissions();
+			Set<Permission> permissions = user.getAllPermissions();
 			
+			
+			try {
+				Route route = routeService.findByRouteOperation(request.getRequestURI(), request.getMethod());
+				Permission permissionRoute = repository.findByRoute(route);
+				
+				System.out.println("URI: " + request.getRequestURI() + " || " + request.getMethod());
+				
+				if(!permissions.isEmpty() && permissionRoute != null) {
+					try {
+						boolean returnValue = permissions.stream().anyMatch(t -> t.equals(permissionRoute));
+						return returnValue;
 
-			Permission permissionRoute = repository.findByRoute(routeService.findByRouteOperation(request.getRequestURI(), request.getMethod()));
-			
-			System.out.println("URI: " + request.getRequestURI() + " || " + request.getMethod());
-			
-			if(!permissions.isEmpty() && permissionRoute != null) {
-				try {
-					boolean returnValue = permissions.stream().anyMatch(t -> t.equals(permissionRoute));
-					return returnValue;
-
-				} catch (Exception e) {
-					e.printStackTrace();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+//					return returnValue; 
 				}
-//				return returnValue; 
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
+			
+			
+			
+			
 			
 		}
 

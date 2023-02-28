@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
+import com.imoob.hml.model.Client;
 import com.imoob.hml.model.Permission;
 import com.imoob.hml.model.User;
 import com.imoob.hml.model.UserPermission;
@@ -41,11 +42,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserService {
 	private final UserRepository repository;
-	
+
 	private final PermissionService permissionService;
-	
+
 	private final UserPermissionRepository userPermissionRepository;
-	
+
 	private final ObjectMapper objectMapper;;
 
 	private final PasswordEncoder passwordEncoder;
@@ -53,7 +54,7 @@ public class UserService {
 	public List<User> findAll(Pageable pageable) {
 		return repository.findAll(pageable);
 	}
-	
+
 	public List<User> findAllByRealEstate(Long id, Pageable pageable) {
 		return repository.findAllByRealEstate(id, pageable);
 	}
@@ -63,7 +64,7 @@ public class UserService {
 		return obj.orElseThrow(() -> new ResourceNotFoundException(id, User.class));
 	}
 
-	public User insert(User obj) {
+	public Client insert(Client obj) {
 		validateEmptyFields(obj);
 		validateDuplicatedUser(obj);
 		obj.setStatus(UserStatus.PENDING);
@@ -101,8 +102,9 @@ public class UserService {
 		entity.setEmail(obj.getEmail());
 		entity.setStatus(obj.getStatus());
 		entity.setCpf(obj.getCpf());
-		entity.setCepAddress(obj.getCepAddress());
-		entity.setNumberAddress(obj.getNumberAddress());
+		//TODO verificar como será feito os campos. Ambos fazem parte de cliente
+//		entity.setCepAddress(obj.getCepAddress());
+//		entity.setNumberAddress(obj.getNumberAddress());
 		entity.setBirthDate(obj.getBirthDate());
 		entity.setLastUpdate(Instant.now());
 
@@ -335,27 +337,28 @@ public class UserService {
 	public User assignPermission(UserPermissionAssignmentDTO obj) {
 		User user = findUserById(obj.getUser());
 		Permission permission = permissionService.findById(obj.getPermission());
-		
+
 		validateAssignPermission(user, permission);
-		
+
 		UserPermission up = new UserPermission(user, permission, Instant.now());
 		up = userPermissionRepository.save(up);
-		
-		Set<UserPermission> listPermissions = user.getAllPermissions();
+
+		Set<UserPermission> listPermissions = user.getPermissions();
 		listPermissions.add(up);
 		user.setPermissions(listPermissions);
 //		user.getPermissions().add(permission);
 		return user;
-		
+
 	}
 
 	/**
 	 * Validates if user already has the permission
+	 * 
 	 * @param user
 	 * @param permission
 	 */
 	private void validateAssignPermission(User user, Permission permission) {
-		if(user.getPermissions().contains(permission)) {
+		if (user.getPermissions().contains(permission)) {
 			throw new GeneralException("A permissão solicitada já está atribuída ao usuário.");
 		}
 	}
@@ -363,21 +366,26 @@ public class UserService {
 	public User unassignPermission(UserPermissionAssignmentDTO obj) {
 		User user = findUserById(obj.getUser());
 		Permission permission = permissionService.findById(obj.getPermission());
-		
-		
+
 		UserPermission up = userPermissionRepository.findByUserPermission(user.getId(), permission.getId());
-		
-		if(up == null) {
+
+		if (up == null) {
 			throw new GeneralException("A permissão não está atribuída à esse usuário.", User.class);
 		}
 		userPermissionRepository.delete(up);
-		
-		Set<UserPermission> listPermissions = user.getAllPermissions();
+
+		Set<UserPermission> listPermissions = user.getPermissions();
 		listPermissions.remove(up);
 		user.setPermissions(listPermissions);
-		
+
 		return user;
-		
+
+	}
+
+	public User approveUser(Long id) {
+		User user = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id, User.class));
+		user.setStatus(UserStatus.ACTIVE);
+		return user;
 	}
 
 }

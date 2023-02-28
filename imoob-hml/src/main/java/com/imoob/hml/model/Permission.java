@@ -81,8 +81,13 @@ public class Permission implements Serializable{
 	private Set<Grouping> groupings = new HashSet<>();
 	
 	@JsonIgnore
-	private Set<User> getUsers(){
+	public Set<User> getAllUsers(){
 		return users.stream().map(userPermission -> userPermission.getId().getUser()).collect(Collectors.toSet());
+	}
+	
+	@JsonIgnore
+	public Set<UserPermission> Users(){
+		return this.users;
 	}
 
 	@Override

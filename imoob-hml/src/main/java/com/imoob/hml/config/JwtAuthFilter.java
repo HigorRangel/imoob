@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -57,11 +58,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 				UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
 				if (jwtService.isTokenValid(jwtToken, userDetails)) {
-					UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
-							null, userDetails.getAuthorities());
+					try {
+						UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
+								null, userDetails.getAuthorities());
 
-					authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-					SecurityContextHolder.getContext().setAuthentication(authToken);
+						authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+						SecurityContextHolder.getContext().setAuthentication(authToken);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					
 				}
 
 				if (!permissionService.validatePermission(request, userDetails)) {
@@ -85,7 +91,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 		} catch (AccessDeniedException e) {
 			accessDeniedException(request, response, e);
 		} catch (Exception e) {
-//			e.printStackTrace();
+			e.printStackTrace();
 		}
 
 	}

@@ -36,7 +36,7 @@ public class UserPermissionDTO {
 		this.lastUpdate = user.getInactived();
 		this.permissions = user.getPermissions()
 				.stream()
-				.map(PermissionDTO::new)
+				.map(permission -> new PermissionDTO(permission.getPermission()))
 				.collect(Collectors.toList());
 	}
 
